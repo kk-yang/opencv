@@ -157,7 +157,7 @@ Custom type is wrapped as Mat-compatible `CV_8UC<N>` values (N = sizeof(T), N <=
 class CV_EXPORTS _InputArray
 {
 public:
-    enum {
+    enum KindFlag {
         KIND_SHIFT = 16,
         FIXED_TYPE = 0x8000 << KIND_SHIFT,
         FIXED_SIZE = 0x4000 << KIND_SHIFT,
@@ -222,7 +222,7 @@ public:
     void* getObj() const;
     Size getSz() const;
 
-    int kind() const;
+    _InputArray::KindFlag kind() const;
     int dims(int i=-1) const;
     int cols(int i=-1) const;
     int rows(int i=-1) const;
@@ -258,7 +258,9 @@ protected:
     void init(int _flags, const void* _obj);
     void init(int _flags, const void* _obj, Size _sz);
 };
-
+CV_ENUM_FLAGS(_InputArray::KindFlag);
+__CV_ENUM_FLAGS_ARITHMETIC_PLUS(_InputArray::KindFlag, AccessFlag); //TODO: Remove this
+__CV_ENUM_FLAGS_ARITHMETIC_PLUS(_InputArray::KindFlag, _InputArray::KindFlag); //TODO: Remove this
 
 /** @brief This type is very similar to InputArray except that it is used for input/output and output function
 parameters.
