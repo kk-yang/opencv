@@ -263,6 +263,13 @@ if(CUDA_FOUND)
       ocv_warnings_disable(CMAKE_CXX_FLAGS -Wunused-but-set-variable)
     endif()
 
+    if(ENABLE_TYPE_SAFE_API)
+      set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -Xcompiler -DCV_TYPE_SAFE_API=1)
+      if(ENABLE_COMPATIBLE_API)
+        set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -Xcompiler -DCV_COMPATIBLE_API=1)
+      endif()
+    endif()
+
     CUDA_COMPILE(${VAR} ${ARGN})
 
     foreach(var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_DEBUG)

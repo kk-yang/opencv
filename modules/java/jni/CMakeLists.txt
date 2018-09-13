@@ -82,6 +82,14 @@ endif()
 
 set(__install_export "")
 if(BUILD_FAT_JAVA_LIB)
+  # libopencv_java.so is used during native Android builds (without opencv_core)
+  if(ENABLE_TYPE_SAFE_API)
+    ocv_target_compile_definitions(${the_module} PUBLIC CV_TYPE_SAFE_API=1)
+    if(ENABLE_COMPATIBLE_API)
+      ocv_target_compile_definitions(${the_module} PUBLIC CV_COMPATIBLE_API=1)
+    endif()
+  endif()
+
   set(__install_export EXPORT OpenCVModules)
 endif()
 

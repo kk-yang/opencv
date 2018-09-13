@@ -346,14 +346,8 @@ OCV_OPTION(CV_TRACE                   "Enable OpenCV code trace" ON)
 OCV_OPTION(ENABLE_PYLINT              "Add target with Pylint checks"                            (BUILD_DOCS OR BUILD_EXAMPLES) IF (NOT CMAKE_CROSSCOMPILING AND NOT APPLE_FRAMEWORK) )
 OCV_OPTION(ENABLE_FLAKE8              "Add target with Python flake8 checker"                    (BUILD_DOCS OR BUILD_EXAMPLES) IF (NOT CMAKE_CROSSCOMPILING AND NOT APPLE_FRAMEWORK) )
 
-if(ENABLE_TYPE_SAFE_API)
-  add_definitions(-DCV_TYPE_SAFE_API)
-else()
-    set(ENABLE_COMPATIBLE_API OFF)
-endif()
-
-if(ENABLE_COMPATIBLE_API)
-  add_definitions(-DCV_COMPATIBLE_API)
+if(NOT ENABLE_TYPE_SAFE_API)
+  ocv_assert(NOT ENABLE_COMPATIBLE_API)
 endif()
 
 if(ENABLE_IMPL_COLLECTION)
