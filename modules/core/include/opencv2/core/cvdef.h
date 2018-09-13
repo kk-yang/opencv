@@ -277,6 +277,16 @@ Cv64suf;
 #  endif
 #endif
 
+#ifndef CV_DEPRECATED_MSG
+#  if defined(__GNUC__)
+#    define CV_DEPRECATED_MSG(msg) __attribute__ ((deprecated(msg)))
+#  elif defined(_MSC_VER)
+#    define CV_DEPRECATED_MSG(msg) __declspec(deprecated(msg))
+#  else
+#    define CV_DEPRECATED_MSG(msg)
+#  endif
+#endif
+
 #ifndef CV_EXTERN_C
 #  ifdef __cplusplus
 #    define CV_EXTERN_C extern "C"

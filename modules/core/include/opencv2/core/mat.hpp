@@ -68,7 +68,7 @@ enum AccessFlag
 };
 CV_ENUM_FLAGS(AccessFlag);
 __CV_ENUM_FLAGS_BITWISE_AND(AccessFlag, MagicFlag, AccessFlag);
-#if defined(CV_TYPE_SAFE_API)
+#ifdef CV_TYPE_SAFE_API
 CV_ENUM_FLAGS(MagicFlag);
 CV_ENUM_FLAGS(ElemType);
 __CV_ENUM_FLAGS_BITWISE_OR(MagicFlag, int, MagicFlag);
@@ -80,9 +80,12 @@ __CV_ENUM_FLAGS_BITWISE_OR_EQ(MagicFlag, ElemType);
 __CV_ENUM_FLAGS_BITWISE_AND(ElemType, MagicFlag, ElemType);
 __CV_ENUM_FLAGS_BITWISE_AND_EQ(MagicFlag, ElemType);
 
-
 __CV_ENUM_FLAGS_BITWISE_OR(MagicFlag, ElemType, AccessFlag);
 __CV_ENUM_FLAGS_BITWISE_OR(MagicFlag, MagicFlag, AccessFlag);
+#endif
+
+#ifdef CV_TRANSNATIONAL_API
+__CV_ENUM_FLAGS_BITWISE_OR(MagicFlag, MagicFlag, ElemDepth);
 #endif
 
 CV__DEBUG_NS_BEGIN
@@ -282,7 +285,7 @@ protected:
 CV_ENUM_FLAGS(_InputArray::KindFlag);
 __CV_ENUM_FLAGS_BITWISE_AND(_InputArray::KindFlag, MagicFlag, _InputArray::KindFlag);
 __CV_ENUM_FLAGS_BITWISE_OR_EQ(MagicFlag, _InputArray::KindFlag);
-#if defined(CV_TYPE_SAFE_API)
+#ifdef CV_TYPE_SAFE_API
 __CV_ENUM_FLAGS_BITWISE_OR(MagicFlag, MagicFlag, _InputArray::KindFlag);
 __CV_ENUM_FLAGS_BITWISE_OR(MagicFlag, _InputArray::KindFlag, ElemType);
 __CV_ENUM_FLAGS_BITWISE_OR(MagicFlag, _InputArray::KindFlag, AccessFlag);
@@ -387,9 +390,57 @@ public:
     ogl::Buffer& getOGlBufferRef() const;
     cuda::HostMem& getHostMemRef() const;
     void create(Size sz, ElemType type, int i = -1, bool allowTransposed = false, _OutputArray::DepthMask fixedDepthMask = static_cast<_OutputArray::DepthMask>(0)) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(Size _sz, int _type, int i = -1, bool allowTransposed = false, _OutputArray::DepthMask fixedDepthMask = static_cast<_OutputArray::DepthMask>(0)) const
+    {
+        create(_sz, static_cast<ElemType>(_type), i, allowTransposed, fixedDepthMask);
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(Size _sz, ElemDepth _type, int i = -1, bool allowTransposed = false, _OutputArray::DepthMask fixedDepthMask = static_cast<_OutputArray::DepthMask>(0)) const
+    {
+        create(_sz, CV_MAKETYPE(_type, 1), i, allowTransposed, fixedDepthMask);
+    }
+#endif // CV_COMPATIBLE_API
     void create(int rows, int cols, ElemType type, int i = -1, bool allowTransposed = false, _OutputArray::DepthMask fixedDepthMask = static_cast<_OutputArray::DepthMask>(0)) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(int _rows, int _cols, int _type, int i = -1, bool allowTransposed = false, _OutputArray::DepthMask fixedDepthMask = static_cast<_OutputArray::DepthMask>(0)) const
+    {
+        create(_rows, _cols, static_cast<ElemType>(_type), i, allowTransposed, fixedDepthMask);
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(int _rows, int _cols, ElemDepth _type, int i = -1, bool allowTransposed = false, _OutputArray::DepthMask fixedDepthMask = static_cast<_OutputArray::DepthMask>(0)) const
+    {
+        create(_rows, _cols, CV_MAKETYPE(_type, 1), i, allowTransposed, fixedDepthMask);
+    }
+#endif // CV_COMPATIBLE_API
     void create(int dims, const int* size, ElemType type, int i = -1, bool allowTransposed = false, _OutputArray::DepthMask fixedDepthMask = static_cast<_OutputArray::DepthMask>(0)) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(int _dims, const int* _size, int _type, int i = -1, bool allowTransposed = false, _OutputArray::DepthMask fixedDepthMask = static_cast<_OutputArray::DepthMask>(0)) const
+    {
+        create(_dims, _size, static_cast<ElemType>(_type), i, allowTransposed, fixedDepthMask);
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(int _dims, const int* _size, ElemDepth _type, int i = -1, bool allowTransposed = false, _OutputArray::DepthMask fixedDepthMask = static_cast<_OutputArray::DepthMask>(0)) const
+    {
+        create(_dims, _size, CV_MAKETYPE(_type, 1), i, allowTransposed, fixedDepthMask);
+    }
+#endif // CV_COMPATIBLE_API
     void createSameSize(const _InputArray& arr, ElemType mtype) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(mtype, mtype)
+    inline void createSameSize(const _InputArray& arr, int mtype) const
+    {
+        createSameSize(arr, static_cast<ElemType>(mtype));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(mtype, mtype)
+    inline void createSameSize(const _InputArray& arr, ElemDepth mtype) const
+    {
+        createSameSize(arr, CV_MAKETYPE(mtype, 1));
+    }
+#endif // CV_COMPATIBLE_API
     void release() const;
     void clear() const;
     void setTo(const _InputArray& value, const _InputArray & mask = _InputArray()) const;
@@ -498,6 +549,20 @@ public:
     //virtual void deallocate(int* refcount, uchar* datastart, uchar* data) = 0;
     virtual UMatData* allocate(int dims, const int* sizes, ElemType type,
                                void* data, size_t* step, AccessFlag flags, UMatUsageFlags usageFlags) const = 0;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline virtual UMatData* allocate(int dims, const int* _sizes, int _type,
+                               void* _data, size_t* _step, AccessFlag flags, UMatUsageFlags _usageFlags) const
+    {
+        return allocate(dims, _sizes, static_cast<ElemType>(_type), _data, _step, flags, _usageFlags);
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline virtual UMatData* allocate(int dims, const int* _sizes, ElemDepth _type,
+                               void* _data, size_t* _step, AccessFlag flags, UMatUsageFlags _usageFlags) const
+    {
+        return allocate(dims, _sizes, CV_MAKETYPE(_type, 1), _data, _step, flags, _usageFlags);
+    }
+#endif // CV_COMPATIBLE_API
     virtual bool allocate(UMatData* data, AccessFlag accessflags, UMatUsageFlags usageFlags) const = 0;
     virtual void deallocate(UMatData* data) const = 0;
     virtual void map(UMatData* data, AccessFlag accessflags) const;
@@ -836,6 +901,18 @@ public:
     CV_8UC(n), ..., CV_64FC(n) to create multi-channel (up to CV_CN_MAX channels) matrices.
     */
     Mat(int rows, int cols, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(int _rows, int _cols, int _type)
+        : Mat(_rows, _cols, static_cast<ElemType>(_type))
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(int _rows, int _cols, ElemDepth _type)
+        : Mat(_rows, _cols, CV_MAKETYPE(_type, 1))
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param size 2D array size: Size(cols, rows) . In the Size() constructor, the number of rows and the
@@ -844,6 +921,18 @@ public:
     CV_8UC(n), ..., CV_64FC(n) to create multi-channel (up to CV_CN_MAX channels) matrices.
       */
     Mat(Size size, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(Size _size, int _type)
+        : Mat(_size, static_cast<ElemType>(_type))
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(Size _size, ElemDepth _type)
+        : Mat(_size, CV_MAKETYPE(_type, 1))
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param rows Number of rows in a 2D array.
@@ -855,6 +944,18 @@ public:
     Mat::operator=(const Scalar& value) .
     */
     Mat(int rows, int cols, ElemType type, const Scalar& s);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(int _rows, int _cols, int _type, const Scalar& s)
+        : Mat(_rows, _cols, static_cast<ElemType>(_type), s)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(int _rows, int _cols, ElemDepth _type, const Scalar& s)
+        : Mat(_rows, _cols, CV_MAKETYPE(_type, 1), s)
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param size 2D array size: Size(cols, rows) . In the Size() constructor, the number of rows and the
@@ -866,6 +967,18 @@ public:
     Mat::operator=(const Scalar& value) .
       */
     Mat(Size size, ElemType type, const Scalar& s);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(Size _size, int _type, const Scalar& s)
+        : Mat(_size, static_cast<ElemType>(_type), s)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(Size _size, ElemDepth _type, const Scalar& s)
+        : Mat(_size, CV_MAKETYPE(_type, 1), s)
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param ndims Array dimensionality.
@@ -874,6 +987,18 @@ public:
     CV_8UC(n), ..., CV_64FC(n) to create multi-channel (up to CV_CN_MAX channels) matrices.
     */
     Mat(int ndims, const int* sizes, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(int ndims, const int* _sizes, int _type)
+        : Mat(ndims, _sizes, static_cast<ElemType>(_type))
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(int ndims, const int* _sizes, ElemDepth _type)
+        : Mat(ndims, _sizes, CV_MAKETYPE(_type, 1))
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param sizes Array of integers specifying an n-dimensional array shape.
@@ -881,6 +1006,18 @@ public:
     CV_8UC(n), ..., CV_64FC(n) to create multi-channel (up to CV_CN_MAX channels) matrices.
     */
     Mat(const std::vector<int>& sizes, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(const std::vector<int>& _sizes, int _type)
+        : Mat(_sizes, static_cast<ElemType>(_type))
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(const std::vector<int>& _sizes, ElemDepth _type)
+        : Mat(_sizes, CV_MAKETYPE(_type, 1))
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param ndims Array dimensionality.
@@ -892,6 +1029,18 @@ public:
     Mat::operator=(const Scalar& value) .
     */
     Mat(int ndims, const int* sizes, ElemType type, const Scalar& s);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(int ndims, const int* _sizes, int _type, const Scalar& s)
+        : Mat(ndims, _sizes, static_cast<ElemType>(_type), s)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(int ndims, const int* _sizes, ElemDepth _type, const Scalar& s)
+        : Mat(ndims, _sizes, CV_MAKETYPE(_type, 1), s)
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param sizes Array of integers specifying an n-dimensional array shape.
@@ -902,6 +1051,18 @@ public:
     Mat::operator=(const Scalar& value) .
     */
     Mat(const std::vector<int>& sizes, ElemType type, const Scalar& s);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(const std::vector<int>& _sizes, int _type, const Scalar& s)
+        : Mat(_sizes, static_cast<ElemType>(_type), s)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(const std::vector<int>& _sizes, ElemDepth _type, const Scalar& s)
+        : Mat(_sizes, CV_MAKETYPE(_type, 1), s)
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
 
     /** @overload
@@ -928,6 +1089,18 @@ public:
     and the actual step is calculated as cols*elemSize(). See Mat::elemSize.
     */
     Mat(int rows, int cols, ElemType type, void* data, size_t step = AUTO_STEP);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(int _rows, int _cols, int _type, void* _data, size_t _step = AUTO_STEP)
+        : Mat(_rows, _cols, static_cast<ElemType>(_type), _data, _step)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(int _rows, int _cols, ElemDepth _type, void* _data, size_t _step = AUTO_STEP)
+        : Mat(_rows, _cols, CV_MAKETYPE(_type, 1), _data, _step)
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param size 2D array size: Size(cols, rows) . In the Size() constructor, the number of rows and the
@@ -944,6 +1117,18 @@ public:
     and the actual step is calculated as cols*elemSize(). See Mat::elemSize.
     */
     Mat(Size size, ElemType type, void* data, size_t step = AUTO_STEP);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(Size _size, int _type, void* _data, size_t _step = AUTO_STEP)
+        : Mat(_size, static_cast<ElemType>(_type), _data, _step)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(Size _size, ElemDepth _type, void* _data, size_t _step = AUTO_STEP)
+        : Mat(_size, CV_MAKETYPE(_type, 1), _data, _step)
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param ndims Array dimensionality.
@@ -959,6 +1144,18 @@ public:
     set to the element size). If not specified, the matrix is assumed to be continuous.
     */
     Mat(int ndims, const int* sizes, ElemType type, void* data, const size_t* steps = 0);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(int ndims, const int* _sizes, int _type, void* _data, const size_t* steps = 0)
+        : Mat(ndims, _sizes, static_cast<ElemType>(_type), _data, steps)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(int ndims, const int* _sizes, ElemDepth _type, void* _data, const size_t* steps = 0)
+        : Mat(ndims, _sizes, CV_MAKETYPE(_type, 1), _data, steps)
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param sizes Array of integers specifying an n-dimensional array shape.
@@ -973,6 +1170,18 @@ public:
     set to the element size). If not specified, the matrix is assumed to be continuous.
     */
     Mat(const std::vector<int>& sizes, ElemType type, void* data, const size_t* steps = 0);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(const std::vector<int>& _sizes, int _type, void* _data, const size_t* steps = 0)
+        : Mat(_sizes, static_cast<ElemType>(_type), _data, steps)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline Mat(const std::vector<int>& _sizes, ElemDepth _type, void* _data, const size_t* steps = 0)
+        : Mat(_sizes, CV_MAKETYPE(_type, 1), _data, steps)
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param m Array that (as a whole or partly) is assigned to the constructed matrix. No data is copied
@@ -1255,6 +1464,18 @@ public:
     @param beta optional delta added to the scaled values.
      */
     void convertTo(OutputArray m, ElemDepth ddepth, double alpha = 1, double beta = 0) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMDEPTH_ATTR(dtype, ddepth)
+    inline void convertTo(OutputArray m, int ddepth, double alpha = 1, double beta = 0) const
+    {
+        convertTo(m, static_cast<ElemDepth>(ddepth), alpha, beta);
+    }
+    CV_DEPRECATED_ELEMTYPE_TO_ELEMDEPTH_ATTR(dtype, ddepth)
+    inline void convertTo(OutputArray m, ElemType ddepth, double alpha = 1, double beta = 0) const
+    {
+        convertTo(m, CV_MAT_DEPTH(ddepth), alpha, beta);
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @brief Provides a functional form of convertTo.
 
@@ -1262,7 +1483,20 @@ public:
     @param m Destination array.
     @param depth Desired destination array depth (or CV_DEPTH_AUTO if it should be the same as the source type).
      */
+
     void assignTo(Mat& m, ElemDepth depth = CV_DEPTH_AUTO) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMDEPTH_ATTR(type, depth)
+    inline void assignTo(Mat& m, int _depth) const
+    {
+        assignTo(m, static_cast<ElemDepth>(_depth));
+    }
+    CV_DEPRECATED_ELEMTYPE_TO_ELEMDEPTH_ATTR(type, depth)
+    inline void assignTo(Mat& m, ElemType _depth) const
+    {
+        assignTo(m, CV_MAT_DEPTH(_depth));
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @brief Sets all or some of the array elements to the specified value.
     @param s Assigned scalar converted to the actual array type.
@@ -1379,12 +1613,24 @@ public:
     @param type Created matrix type.
      */
     static MatExpr zeros(int rows, int cols, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr zeros(int rows, int cols, int _type);
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr zeros(int rows, int cols, ElemDepth _type);
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param size Alternative to the matrix size specification Size(cols, rows) .
     @param type Created matrix type.
     */
     static MatExpr zeros(Size size, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr zeros(Size size, int _type);
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr zeros(Size size, ElemDepth _type);
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param ndims Array dimensionality.
@@ -1392,6 +1638,12 @@ public:
     @param type Created matrix type.
     */
     static MatExpr zeros(int ndims, const int* sz, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr zeros(int ndims, const int* sz, int _type);
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr zeros(int ndims, const int* sz, ElemDepth _type);
+#endif // CV_COMPATIBLE_API
 
     /** @brief Returns an array of all 1's of the specified size and type.
 
@@ -1410,12 +1662,24 @@ public:
     @param type Created matrix type.
      */
     static MatExpr ones(int rows, int cols, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr ones(int rows, int cols, int _type);
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr ones(int rows, int cols, ElemDepth _type);
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param size Alternative to the matrix size specification Size(cols, rows) .
     @param type Created matrix type.
     */
     static MatExpr ones(Size size, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr ones(Size size, int _type);
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr ones(Size size, ElemDepth _type);
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param ndims Array dimensionality.
@@ -1423,6 +1687,12 @@ public:
     @param type Created matrix type.
     */
     static MatExpr ones(int ndims, const int* sz, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr ones(int ndims, const int* sz, int _type);
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr ones(int ndims, const int* sz, ElemDepth _type);
+#endif // CV_COMPATIBLE_API
 
     /** @brief Returns an identity matrix of the specified size and type.
 
@@ -1439,12 +1709,24 @@ public:
     @param type Created matrix type.
      */
     static MatExpr eye(int rows, int cols, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr eye(int rows, int cols, int _type);
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr eye(int rows, int cols, ElemDepth _type);
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param size Alternative matrix size specification as Size(cols, rows) .
     @param type Created matrix type.
     */
     static MatExpr eye(Size size, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr eye(Size size, int _type);
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static MatExpr eye(Size size, ElemDepth _type);
+#endif // CV_COMPATIBLE_API
 
     /** @brief Allocates new array data if needed.
 
@@ -1480,12 +1762,36 @@ public:
     @param type New matrix type.
      */
     void create(int rows, int cols, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(int _rows, int _cols, int _type)
+    {
+        create(_rows, _cols, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(int _rows, int _cols, ElemDepth _type)
+    {
+        create(_rows, _cols, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param size Alternative new matrix size specification: Size(cols, rows)
     @param type New matrix type.
     */
     void create(Size size, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(Size _size, int _type)
+    {
+        create(_size, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(Size _size, ElemDepth _type)
+    {
+        create(_size, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param ndims New array dimensionality.
@@ -1493,12 +1799,36 @@ public:
     @param type New matrix type.
     */
     void create(int ndims, const int* sizes, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(int ndims, const int* _sizes, int _type)
+    {
+        create(ndims, _sizes, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(int ndims, const int* _sizes, ElemDepth _type)
+    {
+        create(ndims, _sizes, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param sizes Array of integers specifying a new array shape.
     @param type New matrix type.
     */
     void create(const std::vector<int>& sizes, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(const std::vector<int>& sizes, int _type)
+    {
+        create(sizes, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(const std::vector<int>& sizes, ElemDepth _type)
+    {
+        create(sizes, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @brief Increments the reference counter.
 
@@ -1850,7 +2180,20 @@ public:
      * The following code demonstrates its usage for a 3-d matrix:
      * @snippet snippets/core_mat_checkVector.cpp example-3d
      */
+
     int checkVector(int elemChannels, ElemDepth depth = CV_DEPTH_AUTO, bool requireContinuous = true) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMDEPTH_ATTR(type, depth)
+    inline int checkVector(int elemChannels, int _depth, bool requireContinuous = true) const
+    {
+        return checkVector(elemChannels, static_cast<ElemDepth>(_depth), requireContinuous);
+    }
+    CV_DEPRECATED_ELEMTYPE_TO_ELEMDEPTH_ATTR(type, depth)
+    inline int checkVector(int elemChannels, ElemType _depth, bool requireContinuous = true) const
+    {
+        return checkVector(elemChannels, CV_MAT_DEPTH(_depth), requireContinuous);
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @brief Returns a pointer to the specified matrix row.
 
@@ -2423,14 +2766,86 @@ public:
     //! constructs 2D matrix of the specified size and type
     // (_type is CV_8UC1, CV_64FC3, CV_32SC(12) etc.)
     UMat(int rows, int cols, ElemType type, UMatUsageFlags usageFlags = USAGE_DEFAULT);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline UMat(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+        : UMat(_rows, _cols, static_cast<ElemType>(_type), _usageFlags)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline UMat(int _rows, int _cols, ElemDepth _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+        : UMat(_rows, _cols, CV_MAKETYPE(_type, 1), _usageFlags)
+    {
+    }
+#endif // CV_COMPATIBLE_API
     UMat(Size size, ElemType type, UMatUsageFlags usageFlags = USAGE_DEFAULT);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline UMat(Size _size, int _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+        : UMat(_size, static_cast<ElemType>(_type), _usageFlags)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline UMat(Size _size, ElemDepth _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+        : UMat(_size, CV_MAKETYPE(_type, 1), _usageFlags)
+    {
+    }
+#endif // CV_COMPATIBLE_API
     //! constucts 2D matrix and fills it with the specified value _s.
     UMat(int rows, int cols, ElemType type, const Scalar& s, UMatUsageFlags usageFlags = USAGE_DEFAULT);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline UMat(int _rows, int _cols, int _type, const Scalar& s, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+        : UMat(_rows, _cols, static_cast<ElemType>(_type), s, _usageFlags)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline UMat(int _rows, int _cols, ElemDepth _type, const Scalar& s, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+        : UMat(_rows, _cols, CV_MAKETYPE(_type, 1), s, _usageFlags)
+    {
+    }
+#endif // CV_COMPATIBLE_API
     UMat(Size size, ElemType type, const Scalar& s, UMatUsageFlags usageFlags = USAGE_DEFAULT);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline UMat(Size _size, int _type, const Scalar& s, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+        : UMat(_size, static_cast<ElemType>(_type), s, _usageFlags)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline UMat(Size _size, ElemDepth _type, const Scalar& s, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+        : UMat(_size, CV_MAKETYPE(_type, 1), s, _usageFlags)
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     //! constructs n-dimensional matrix
     UMat(int ndims, const int* sizes, ElemType type, UMatUsageFlags usageFlags = USAGE_DEFAULT);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline UMat(int ndims, const int* _sizes, int _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+        : UMat(ndims, _sizes, static_cast<ElemType>(_type), _usageFlags)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline UMat(int ndims, const int* _sizes, ElemDepth _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+        : UMat(ndims, _sizes, CV_MAKETYPE(_type, 1), _usageFlags)
+    {
+    }
+#endif // CV_COMPATIBLE_API
     UMat(int ndims, const int* sizes, ElemType type, const Scalar& s, UMatUsageFlags usageFlags = USAGE_DEFAULT);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline UMat(int ndims, const int* _sizes, int _type, const Scalar& s, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+        : UMat(ndims, _sizes, static_cast<ElemType>(_type), s, _usageFlags)
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline UMat(int ndims, const int* _sizes, ElemDepth _type, const Scalar& s, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+        : UMat(ndims, _sizes, CV_MAKETYPE(_type, 1), s, _usageFlags)
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     //! copy constructor
     UMat(const UMat& m);
@@ -2488,8 +2903,33 @@ public:
     void copyTo( OutputArray m, InputArray mask ) const;
     //! converts matrix to another datatype with optional scaling. See cvConvertScale.
     void convertTo(OutputArray m, ElemDepth ddepth, double alpha = 1, double beta = 0) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMDEPTH_ATTR(dtype, ddepth)
+    inline void convertTo(OutputArray m, int ddepth, double alpha = 1, double beta = 0) const
+    {
+        convertTo(m, static_cast<ElemDepth>(ddepth), alpha, beta);
+    }
+    CV_DEPRECATED_ELEMTYPE_TO_ELEMDEPTH_ATTR(dtype, ddepth)
+    inline void convertTo(OutputArray m, ElemType ddepth, double alpha = 1, double beta = 0) const
+    {
+        convertTo(m, CV_MAT_DEPTH(ddepth), alpha, beta);
+    }
+#endif // CV_COMPATIBLE_API
+
 
     void assignTo(UMat& m, ElemDepth depth = CV_DEPTH_AUTO) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMDEPTH_ATTR(type, depth)
+    inline void assignTo(UMat& m, int _depth) const
+    {
+        assignTo(m, static_cast<ElemDepth>(_depth));
+    }
+    CV_DEPRECATED_ELEMTYPE_TO_ELEMDEPTH_ATTR(type, depth)
+    inline void assignTo(UMat& m, ElemType _depth) const
+    {
+        assignTo(m, CV_MAT_DEPTH(_depth));
+    }
+#endif // CV_COMPATIBLE_API
 
     //! sets every matrix element to s
     UMat& operator = (const Scalar& s);
@@ -2512,20 +2952,164 @@ public:
 
     //! Matlab-style matrix initialization
     static UMat zeros(int rows, int cols, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat zeros(int _rows, int _cols, int _type)
+    {
+        return zeros(_rows, _cols, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat zeros(int _rows, int _cols, ElemDepth _type)
+    {
+        return zeros(_rows, _cols, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
     static UMat zeros(Size size, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat zeros(Size _size, int _type)
+    {
+        return zeros(_size, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat zeros(Size _size, ElemDepth _type)
+    {
+        return zeros(_size, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
     static UMat zeros(int ndims, const int* sz, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat zeros(int ndims, const int* _sz, int _type)
+    {
+        return zeros(ndims, _sz, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat zeros(int ndims, const int* _sz, ElemDepth _type)
+    {
+        return zeros(ndims, _sz, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
     static UMat ones(int rows, int cols, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat ones(int _rows, int _cols, int _type)
+    {
+        return ones(_rows, _cols, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat ones(int _rows, int _cols, ElemDepth _type)
+    {
+        return ones(_rows, _cols, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
     static UMat ones(Size size, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat ones(Size _size, int _type)
+    {
+        return ones(_size, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat ones(Size _size, ElemDepth _type)
+    {
+        return ones(_size, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
     static UMat ones(int ndims, const int* sz, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat ones(int ndims, const int* _sz, int _type)
+    {
+        return ones(ndims, _sz, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat ones(int ndims, const int* _sz, ElemDepth _type)
+    {
+        return ones(ndims, _sz, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
     static UMat eye(int rows, int cols, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat eye(int _rows, int _cols, int _type)
+    {
+        return eye(_rows, _cols, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat eye(int _rows, int _cols, ElemDepth _type)
+    {
+        return eye(_rows, _cols, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
     static UMat eye(Size size, ElemType type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat eye(Size _size, int _type)
+    {
+        return eye(_size, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    static inline UMat eye(Size _size, ElemDepth _type)
+    {
+        return eye(_size, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
 
     //! allocates new matrix data unless the matrix already has specified size and type.
     // previous data is unreferenced if needed.
     void create(int rows, int cols, ElemType type, UMatUsageFlags usageFlags = USAGE_DEFAULT);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+    {
+        create(_rows, _cols, static_cast<ElemType>(_type), _usageFlags);
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(int _rows, int _cols, ElemDepth _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+    {
+        create(_rows, _cols, CV_MAKETYPE(_type, 1), _usageFlags);
+    }
+#endif // CV_COMPATIBLE_API
     void create(Size size, ElemType type, UMatUsageFlags usageFlags = USAGE_DEFAULT);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(Size _size, int _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+    {
+        create(_size, static_cast<ElemType>(_type), _usageFlags);
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(Size _size, ElemDepth _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+    {
+        create(_size, CV_MAKETYPE(_type, 1), _usageFlags);
+    }
+#endif // CV_COMPATIBLE_API
     void create(int ndims, const int* sizes, ElemType type, UMatUsageFlags usageFlags = USAGE_DEFAULT);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(int ndims, const int* _sizes, int _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+    {
+        create(ndims, _sizes, static_cast<ElemType>(_type), _usageFlags);
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(int ndims, const int* _sizes, ElemDepth _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+    {
+        create(ndims, _sizes, CV_MAKETYPE(_type, 1), _usageFlags);
+    }
+#endif // CV_COMPATIBLE_API
     void create(const std::vector<int>& sizes, ElemType type, UMatUsageFlags usageFlags = USAGE_DEFAULT);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(const std::vector<int>& sizes, int _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+    {
+        create(sizes, static_cast<ElemType>(_type), _usageFlags);
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(type, type)
+    inline void create(const std::vector<int>& sizes, ElemDepth _type, UMatUsageFlags _usageFlags = USAGE_DEFAULT)
+    {
+        create(sizes, CV_MAKETYPE(_type, 1), _usageFlags);
+    }
+#endif // CV_COMPATIBLE_API
 
     //! increases the reference counter; use with care to avoid memleaks
     void addref();
@@ -2576,7 +3160,20 @@ public:
     size_t total() const;
 
     //! returns N if the matrix is 1-channel (N x ptdim) or ptdim-channel (1 x N) or (N x 1); negative number otherwise
+
     int checkVector(int elemChannels, ElemDepth depth = CV_DEPTH_AUTO, bool requireContinuous = true) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMDEPTH_ATTR(type, depth)
+    inline int checkVector(int elemChannels, int _depth, bool requireContinuous = true) const
+    {
+        return checkVector(elemChannels, static_cast<ElemDepth>(_depth), requireContinuous );
+    }
+    CV_DEPRECATED_ELEMTYPE_TO_ELEMDEPTH_ATTR(type, depth)
+    inline int checkVector(int elemChannels, ElemType _depth, bool requireContinuous = true) const
+    {
+        return checkVector(elemChannels, CV_MAT_DEPTH(_depth), requireContinuous );
+    }
+#endif // CV_COMPATIBLE_API
 
     UMat(UMat&& m);
     UMat& operator = (UMat&& m);
@@ -2733,6 +3330,18 @@ public:
     struct CV_EXPORTS Hdr
     {
         Hdr(int _dims, const int* _sizes, ElemType _type);
+#ifdef CV_COMPATIBLE_API
+        CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(_type, _type)
+        inline Hdr(int _dims, const int* _sizes, int _type)
+            : Hdr(_dims, _sizes, static_cast<ElemType>(_type))
+        {
+        }
+        CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(_type, _type)
+        inline Hdr(int _dims, const int* _sizes, ElemDepth _type)
+            : Hdr(_dims, _sizes, CV_MAKETYPE(_type, 1))
+        {
+        }
+#endif // CV_COMPATIBLE_API
         void clear();
         int refcount;
         int dims;
@@ -2766,6 +3375,18 @@ public:
     @param _type Sparse matrix data type.
     */
     SparseMat(int dims, const int* _sizes, ElemType _type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(_type, _type)
+    inline SparseMat(int _dims, const int* _sizes, int _type)
+        : SparseMat(_dims, _sizes, static_cast<ElemType>(_type))
+    {
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(_type, _type)
+    inline SparseMat(int _dims, const int* _sizes, ElemDepth _type)
+        : SparseMat(_dims, _sizes, CV_MAKETYPE(_type, 1))
+    {
+    }
+#endif // CV_COMPATIBLE_API
 
     /** @overload
     @param m Source matrix for copy constructor. If m is dense matrix (ocvMat) then it will be converted
@@ -2796,6 +3417,18 @@ public:
     void copyTo( Mat& m ) const;
     //! multiplies all the matrix elements by the specified scale factor alpha and converts the results to the specified data type
     void convertTo(SparseMat& m, ElemDepth ddepth, double alpha = 1) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMDEPTH_ATTR(dtype, ddepth)
+    inline void convertTo(SparseMat& m, int ddepth, double alpha = 1) const
+    {
+        convertTo(m, static_cast<ElemDepth>(ddepth), alpha );
+    }
+    CV_DEPRECATED_ELEMTYPE_TO_ELEMDEPTH_ATTR(dtype, ddepth)
+    inline void convertTo(SparseMat& m, ElemType ddepth, double alpha = 1) const
+    {
+        convertTo(m, CV_MAT_DEPTH(ddepth), alpha );
+    }
+#endif // CV_COMPATIBLE_API
     //! converts sparse matrix to dense n-dim matrix with optional type conversion and scaling.
     /*!
         @param [out] m - output matrix; if it does not have a proper size or type before the operation,
@@ -2805,9 +3438,34 @@ public:
         @param [in] beta - optional delta added to the scaled values
     */
     void convertTo(Mat& m, ElemDepth ddepth, double alpha = 1, double beta = 0) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMDEPTH_ATTR(dtype, ddepth)
+    inline void convertTo(Mat& m, int ddepth, double alpha = 1, double beta = 0) const
+    {
+        convertTo(m, static_cast<ElemDepth>(ddepth), alpha, beta );
+    }
+    CV_DEPRECATED_ELEMTYPE_TO_ELEMDEPTH_ATTR(dtype, ddepth)
+    inline void convertTo(Mat& m, ElemType ddepth, double alpha = 1, double beta = 0) const
+    {
+        convertTo(m, CV_MAT_DEPTH(ddepth), alpha, beta );
+    }
+#endif // CV_COMPATIBLE_API
 
     // not used now
+
     void assignTo(SparseMat& m, ElemDepth depth = CV_DEPTH_AUTO) const;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMDEPTH_ATTR(type, depth)
+    inline void assignTo(SparseMat& m, int _depth) const
+    {
+        assignTo(m, static_cast<ElemDepth>(_depth) );
+    }
+    CV_DEPRECATED_ELEMTYPE_TO_ELEMDEPTH_ATTR(type, depth)
+    inline void assignTo(SparseMat& m, ElemType _depth) const
+    {
+        assignTo(m, CV_MAT_DEPTH(_depth) );
+    }
+#endif // CV_COMPATIBLE_API
 
     //! reallocates sparse matrix.
     /*!
@@ -2816,6 +3474,18 @@ public:
         the old matrix is released (using release()) and the new one is allocated.
     */
     void create(int dims, const int* _sizes, ElemType _type);
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMTYPE_ATTR(_type, _type)
+    inline void create(int _dims, const int* _sizes, int _type)
+    {
+        create(_dims, _sizes, static_cast<ElemType>(_type));
+    }
+    CV_DEPRECATED_ELEMDEPTH_TO_ELEMTYPE_ATTR(_type, _type)
+    inline void create(int _dims, const int* _sizes, ElemDepth _type)
+    {
+        create(_dims, _sizes, CV_MAKETYPE(_type, 1));
+    }
+#endif // CV_COMPATIBLE_API
     //! sets all the sparse matrix elements to 0, which means clearing the hash table.
     void clear();
     //! manually increments the reference counter to the header.
@@ -3491,7 +4161,20 @@ public:
     virtual ~MatOp();
 
     virtual bool elementWise(const MatExpr& expr) const;
+
     virtual void assign(const MatExpr& expr, Mat& m, ElemDepth depth = CV_DEPTH_AUTO) const = 0;
+#ifdef CV_COMPATIBLE_API
+    CV_DEPRECATED_INT_TO_ELEMDEPTH_ATTR(type, depth)
+    inline virtual void assign(const MatExpr& expr, Mat& m, int _depth) const
+    {
+        assign(expr, m, static_cast<ElemDepth>(_depth));
+    }
+    CV_DEPRECATED_ELEMTYPE_TO_ELEMDEPTH_ATTR(type, depth)
+    inline virtual void assign(const MatExpr& expr, Mat& m, ElemType _depth) const
+    {
+        assign(expr, m, CV_MAT_DEPTH(_depth));
+    }
+#endif // CV_COMPATIBLE_API
     virtual void roi(const MatExpr& expr, const Range& rowRange,
                      const Range& colRange, MatExpr& res) const;
     virtual void diag(const MatExpr& expr, int d, MatExpr& res) const;

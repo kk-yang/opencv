@@ -1756,4 +1756,87 @@ MatExpr Mat::eye(Size size, ElemType type)
     return e;
 }
 
+//MatExpr is incomplete type, thus inline functions does not work!
+#ifdef CV_COMPATIBLE_API
+MatExpr Mat::zeros(int rows, int cols, int type)
+{
+    return zeros(rows, cols, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::zeros(int rows, int cols, ElemDepth type)
+{
+    return zeros(rows, cols, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::zeros(Size size, int type)
+{
+    return zeros(size, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::zeros(Size size, ElemDepth type)
+{
+    return zeros(size, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::zeros(int ndims, const int* sz, int type)
+{
+    return zeros(ndims, sz, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::zeros(int ndims, const int* sz, ElemDepth type)
+{
+    return zeros(ndims, sz, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::ones(int rows, int cols, int type)
+{
+    return ones(rows, cols, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::ones(int rows, int cols, ElemDepth type)
+{
+    return ones(rows, cols, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::ones(Size size, int type)
+{
+    return ones(size, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::ones(Size size, ElemDepth type)
+{
+    return ones(size, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::ones(int ndims, const int* sz, int type)
+{
+    return ones(ndims, sz, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::ones(int ndims, const int* sz, ElemDepth type)
+{
+    return ones(ndims, sz, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::eye(int rows, int cols, int type)
+{
+    return eye(rows, cols, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::eye(int rows, int cols, ElemDepth type)
+{
+    return eye(rows, cols, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::eye(Size size, int type)
+{
+    return eye(size, static_cast<ElemType>(type));
+}
+
+MatExpr Mat::eye(Size size, ElemDepth type)
+{
+    return eye(size, static_cast<ElemType>(type));
+}
+#endif // CV_COMPATIBLE_API
+
 } // cv::

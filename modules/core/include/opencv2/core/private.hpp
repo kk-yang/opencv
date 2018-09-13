@@ -317,6 +317,13 @@ static inline IppDataType ippiGetDataType(ElemDepth depth)
         (IppDataType)-1;
 }
 
+#ifdef CV_TRANSNATIONAL_API
+static inline IppDataType ippiGetDataType(int depth)
+{
+    return ippiGetDataType(static_cast<ElemDepth>(depth));
+}
+#endif // CV_TRANSNATIONAL_API
+
 static inline int ippiSuggestThreadsNum(size_t width, size_t height, size_t elemSize, double multiplier)
 {
     int threads = cv::getNumThreads();
