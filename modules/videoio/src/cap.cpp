@@ -109,6 +109,13 @@ bool  VideoCapture::open(int cameraNum, int apiPreference)
 
     if (isOpened()) release();
 
+    int backendID = (cameraNum / 100) * 100;
+    if (backendID)
+    {
+        cameraNum %= 100;
+        apiPreference = backendID;
+    }
+
     const std::vector<VideoBackendInfo> backends = cv::videoio_registry::getAvailableBackends_CaptureByIndex();
     for (size_t i = 0; i < backends.size(); i++)
     {
