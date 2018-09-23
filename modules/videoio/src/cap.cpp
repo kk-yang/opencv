@@ -58,16 +58,10 @@ VideoCapture::VideoCapture(const String& filename, int apiPreference)
     open(filename, apiPreference);
 }
 
-VideoCapture::VideoCapture(const String& filename)
+VideoCapture::VideoCapture(int cameraNum, int apiPreference)
 {
     CV_TRACE_FUNCTION();
-    open(filename, CAP_ANY);
-}
-
-VideoCapture::VideoCapture(int index)
-{
-    CV_TRACE_FUNCTION();
-    open(index);
+    open(cameraNum, apiPreference);
 }
 
 VideoCapture::~VideoCapture()
@@ -109,13 +103,6 @@ bool VideoCapture::open(const String& filename, int apiPreference)
     return false;
 }
 
-bool VideoCapture::open(const String& filename)
-{
-    CV_TRACE_FUNCTION();
-
-    return open(filename, CAP_ANY);
-}
-
 bool  VideoCapture::open(int cameraNum, int apiPreference)
 {
     CV_TRACE_FUNCTION();
@@ -145,20 +132,6 @@ bool  VideoCapture::open(int cameraNum, int apiPreference)
         }
     }
     return false;
-}
-
-bool VideoCapture::open(int index)
-{
-    CV_TRACE_FUNCTION();
-
-    // interpret preferred interface (0 = autodetect)
-    int backendID = (index / 100) * 100;
-    if (backendID)
-    {
-        index %= 100;
-    }
-
-    return open(index, backendID);
 }
 
 bool VideoCapture::isOpened() const
