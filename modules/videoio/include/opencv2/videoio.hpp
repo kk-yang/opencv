@@ -616,13 +616,6 @@ public:
     CV_WRAP VideoCapture();
 
     /** @overload
-    @brief  Open video file or a capturing device or a IP video stream for video capturing
-
-    Same as VideoCapture(const String& filename, int apiPreference) but using default Capture API backends
-    */
-    CV_WRAP VideoCapture(const String& filename);
-
-    /** @overload
     @brief  Open video file or a capturing device or a IP video stream for video capturing with API Preference
 
     @param filename it can be:
@@ -635,18 +628,17 @@ public:
     implementation if multiple are available: e.g. cv::CAP_FFMPEG or cv::CAP_IMAGES or cv::CAP_DSHOW.
     @sa The list of supported API backends cv::VideoCaptureAPIs
     */
-    CV_WRAP VideoCapture(const String& filename, int apiPreference);
+    CV_WRAP VideoCapture(const String& filename, int apiPreference = CAP_ANY);
 
     /** @overload
     @brief  Open a camera for video capturing
 
-    @param index camera_id + domain_offset (CAP_*) id of the video capturing device to open. To open default camera using default backend just pass 0.
-    Use a `domain_offset` to enforce a specific reader implementation if multiple are available like cv::CAP_FFMPEG or cv::CAP_IMAGES or cv::CAP_DSHOW.
-    e.g. to open Camera 1 using the MS Media Foundation API use `index = 1 + cv::CAP_MSMF`
-
+    @param index id of the video capturing device to open. To open default camera using default backend just pass 0.
+    @param apiPreference preferred Capture API backends to use. Can be used to enforce a specific reader
+    implementation if multiple are available: e.g. cv::CAP_DSHOW or cv::CAP_MSMF or cv::CAP_GSTREAMER.
     @sa The list of supported API backends cv::VideoCaptureAPIs
     */
-    CV_WRAP VideoCapture(int index);
+    CV_WRAP VideoCapture(int index, int apiPreference = CAP_ANY);
 
     /** @brief Default destructor
 
@@ -663,7 +655,7 @@ public:
 
     The method first calls VideoCapture::release to close the already opened file or camera.
      */
-    CV_WRAP virtual bool open(const String& filename);
+    CV_WRAP virtual bool open(const String& filename, int apiPreference = CAP_ANY);
 
     /** @brief  Open a camera for video capturing
 
@@ -674,17 +666,7 @@ public:
 
     The method first calls VideoCapture::release to close the already opened file or camera.
     */
-    CV_WRAP virtual bool open(int index);
-
-   /** @brief  Open a camera for video capturing
-
-    @overload
-
-    Parameters are similar as the constructor VideoCapture(int index),except it takes an additional argument apiPreference.
-    Definitely, is same as open(int index) where `index=cameraNum + apiPreference`
-    @return `true` if the camera has been successfully opened.
-    */
-    CV_WRAP bool open(int cameraNum, int apiPreference);
+    CV_WRAP virtual bool open(int index, int apiPreference = CAP_ANY);
 
     /** @brief Returns true if video capturing has been initialized already.
 
@@ -793,20 +775,8 @@ public:
     The returned value might be different from what really used by the device or it could be encoded
     using device dependent rules (eg. steps or percentage). Effective behaviour depends from device
     driver and API Backend
-
     */
     CV_WRAP virtual double get(int propId) const;
-
-    /** @brief Open video file or a capturing device or a IP video stream for video capturing with API Preference
-
-    @overload
-
-    Parameters are same as the constructor VideoCapture(const String& filename, int apiPreference)
-    @return `true` if the file has been successfully opened
-
-    The method first calls VideoCapture::release to close the already opened file or camera.
-    */
-    CV_WRAP virtual bool open(const String& filename, int apiPreference);
 
 protected:
     Ptr<CvCapture> cap;
