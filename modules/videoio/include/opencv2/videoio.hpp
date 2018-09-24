@@ -594,7 +594,6 @@ The class provides C++ API for capturing video from cameras or for reading video
 Here is how the class can be used:
 @include samples/cpp/videocapture_basic.cpp
 
-@note In @ref videoio_c "C API" the black-box structure `CvCapture` is used instead of %VideoCapture.
 @note
 -   (C++) A basic sample on using the %VideoCapture interface can be found at
     `OPENCV_SOURCE_CODE/samples/cpp/videocapture_starter.cpp`
@@ -609,9 +608,6 @@ class CV_EXPORTS_W VideoCapture
 {
 public:
     /** @brief Default constructor
-    @note In @ref videoio_c "C API", when you finished working with video, release CvCapture structure with
-    cvReleaseCapture(), or use Ptr\<CvCapture\> that calls cvReleaseCapture() automatically in the
-    destructor.
      */
     CV_WRAP VideoCapture();
 
@@ -635,7 +631,7 @@ public:
 
     @param index id of the video capturing device to open. To open default camera using default backend just pass 0.
     @param apiPreference preferred Capture API backends to use. Can be used to enforce a specific reader
-    implementation if multiple are available: e.g. cv::CAP_DSHOW or cv::CAP_MSMF or cv::CAP_GSTREAMER.
+    implementation if multiple are available: e.g. cv::CAP_DSHOW or cv::CAP_MSMF or cv::CAP_V4L.
     @sa The list of supported API backends cv::VideoCaptureAPIs
     */
     CV_WRAP VideoCapture(int index, int apiPreference = CAP_ANY);
@@ -679,8 +675,6 @@ public:
 
     The method is automatically called by subsequent VideoCapture::open and by VideoCapture
     destructor.
-
-    The C function also deallocates memory and clears \*capture pointer.
      */
     CV_WRAP virtual void release();
 
@@ -716,10 +710,6 @@ public:
     and the function returns an empty image (with %cv::Mat, test it with Mat::empty()).
 
     @sa read()
-
-    @note In @ref videoio_c "C API", functions cvRetrieveFrame() and cv.RetrieveFrame() return image stored inside the video
-    capturing structure. It is not allowed to modify or release the image! You can copy the frame using
-    :ocvcvCloneImage and then do whatever you want with the copy.
      */
     CV_WRAP virtual bool retrieve(OutputArray image, int flag = 0);
 
@@ -742,10 +732,6 @@ public:
     most convenient method for reading video files or capturing data from decode and returns the just
     grabbed frame. If no frames has been grabbed (camera has been disconnected, or there are no more
     frames in video file), the method returns false and the function returns empty image (with %cv::Mat, test it with Mat::empty()).
-
-    @note In @ref videoio_c "C API", functions cvRetrieveFrame() and cv.RetrieveFrame() return image stored inside the video
-    capturing structure. It is not allowed to modify or release the image! You can copy the frame using
-    :ocvcvCloneImage and then do whatever you want with the copy.
      */
     CV_WRAP virtual bool read(OutputArray image);
 
