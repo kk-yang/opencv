@@ -442,7 +442,7 @@ bool CV_ChessboardDetectorTest::checkByGenerator()
 
         double err = calcErrorMinError(cbg.cornersSize(), corners_found, corners_generated);
         EXPECT_LE(err, rough_success_error_level) << "bad accuracy of corner guesses";
-#if 0
+#if 1
         if (err >= rough_success_error_level)
         {
             imshow("cb", cb);

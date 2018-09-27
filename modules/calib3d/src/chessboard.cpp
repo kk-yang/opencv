@@ -3187,6 +3187,7 @@ bool findChessboardCornersSB(cv::InputArray image_, cv::Size pattern_size,
     para.max_points = std::max(100,pattern_size.width*pattern_size.height*2);
     para.super_resolution = false;
 
+    flags |= CALIB_CB_NORMALIZE_IMAGE;
     // setup search based on flags
     if(flags & CALIB_CB_NORMALIZE_IMAGE)
     {
