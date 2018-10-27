@@ -744,6 +744,8 @@ macro(ocv_set_module_sources)
 
   # use full paths for module to be independent from the module location
   ocv_convert_to_full_paths(OPENCV_MODULE_${the_module}_HEADERS)
+  list(REMOVE_DUPLICATES OPENCV_MODULE_${the_module}_HEADERS)
+  list(REMOVE_DUPLICATES OPENCV_MODULE_${the_module}_SOURCES)
 
   set(OPENCV_MODULE_${the_module}_HEADERS ${OPENCV_MODULE_${the_module}_HEADERS} CACHE INTERNAL "List of header files for ${the_module}")
   set(OPENCV_MODULE_${the_module}_SOURCES ${OPENCV_MODULE_${the_module}_SOURCES} CACHE INTERNAL "List of source files for ${the_module}")
