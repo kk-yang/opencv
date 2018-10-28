@@ -23,7 +23,7 @@ def bootstrap():
         raise ImportError('ERROR: recursion is detected during loading of "cv2" binary extensions. Check OpenCV installation.')
     sys.OpenCV_LOADER = True
 
-    DEBUG = False
+    DEBUG = True
     if hasattr(sys, 'OpenCV_LOADER_DEBUG'):
         DEBUG = True
 
