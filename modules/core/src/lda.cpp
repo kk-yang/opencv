@@ -330,7 +330,7 @@ private:
         int high = nn - 1;
         double eps = std::pow(2.0, -52.0);
         double exshift = 0.0;
-        double p = 0, q = 0, r = 0, s = 0, z = 0, t, w;
+        double p = 0, q = 0, r = 0, s = 0, t, w;
 
         // Store roots isolated by balanc and compute matrix norm
 
@@ -381,7 +381,7 @@ private:
                 w = H[n1][n1 - 1] * H[n1 - 1][n1];
                 p = (H[n1 - 1][n1 - 1] - H[n1][n1]) / 2.0;
                 q = p * p + w;
-                z = std::sqrt(std::abs(q));
+                double z = std::sqrt(std::abs(q));
                 H[n1][n1] = H[n1][n1] + exshift;
                 H[n1 - 1][n1 - 1] = H[n1 - 1][n1 - 1] + exshift;
                 double x = H[n1][n1];
@@ -496,7 +496,7 @@ private:
                 // Look for two consecutive small sub-diagonal elements
                 int m = n1 - 2;
                 while (m >= l) {
-                    z = H[m][m];
+                    double z = H[m][m];
                     r = x - z;
                     s = y - z;
                     p = (r * s - w) / H[m + 1][m] + H[m][m + 1];
@@ -555,7 +555,7 @@ private:
                         p = p + s;
                         x = p / s;
                         y = q / s;
-                        z = r / s;
+                        double z = r / s;
                         q = q / p;
                         r = r / p;
 
@@ -612,6 +612,9 @@ private:
             // Real vector
 
             if (q == 0) {
+                // Real vector
+                double z = std::numeric_limits<double>::quiet_NaN();
+
                 int l = n1;
                 H[n1][n1] = 1.0;
                 for (int i = n1 - 1; i >= 0; i--) {
@@ -659,6 +662,8 @@ private:
                 }
                 // Complex vector
             } else if (q < 0) {
+                double z = std::numeric_limits<double>::quiet_NaN();
+
                 int l = n1 - 1;
 
                 // Last vector component imaginary so matrix is triangular
@@ -694,7 +699,6 @@ private:
                             H[i][n1 - 1] = cdivr;
                             H[i][n1] = cdivi;
                         } else {
-
                             // Solve complex equations
 
                             double x = H[i][i + 1];
@@ -750,9 +754,9 @@ private:
 
         for (int j = nn - 1; j >= low; j--) {
             for (int i = low; i <= high; i++) {
-                z = 0.0;
+                double z = 0.0;
                 for (int k = low; k <= std::min(j, high); k++) {
-                    z = z + V[i][k] * H[k][j];
+                    z += V[i][k] * H[k][j];
                 }
                 V[i][j] = z;
             }
