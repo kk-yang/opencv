@@ -330,7 +330,7 @@ private:
         int high = nn - 1;
         double eps = std::pow(2.0, -52.0);
         double exshift = 0.0;
-        double p = 0, q = 0, s = 0, t, w;
+        double p = 0, q = 0, t, w;
 
         // Store roots isolated by balanc and compute matrix norm
 
@@ -355,7 +355,7 @@ private:
                 if (norm < FLT_EPSILON) {
                     break;
                 }
-                s = std::abs(H[l - 1][l - 1]) + std::abs(H[l][l]);
+                double s = std::abs(H[l - 1][l - 1]) + std::abs(H[l][l]);
                 if (s == 0.0) {
                     s = norm;
                 }
@@ -402,7 +402,7 @@ private:
                     e[n1 - 1] = 0.0;
                     e[n1] = 0.0;
                     x = H[n1][n1 - 1];
-                    s = std::abs(x) + std::abs(z);
+                    double s = std::abs(x) + std::abs(z);
                     p = x / s;
                     q = z / s;
                     double r = std::sqrt(p * p + q * q);
@@ -465,7 +465,7 @@ private:
                     for (int i = low; i <= n1; i++) {
                         H[i][i] -= x;
                     }
-                    s = std::abs(H[n1][n1 - 1]) + std::abs(H[n1 - 1][n1 - 2]);
+                    double s = std::abs(H[n1][n1 - 1]) + std::abs(H[n1 - 1][n1 - 2]);
                     x = y = 0.75 * s;
                     w = -0.4375 * s * s;
                 }
@@ -473,7 +473,7 @@ private:
                 // MATLAB's new ad hoc shift
 
                 if (iter == 30) {
-                    s = (y - x) / 2.0;
+                    double s = (y - x) / 2.0;
                     s = s * s + w;
                     if (s > 0) {
                         s = std::sqrt(s);
@@ -500,7 +500,7 @@ private:
                 while (m >= l) {
                     double z = H[m][m];
                     r = x - z;
-                    s = y - z;
+                    double s = y - z;
                     p = (r * s - w) / H[m + 1][m] + H[m][m + 1];
                     q = H[m + 1][m + 1] - z - r - s;
                     r = H[m + 2][m + 1];
@@ -545,7 +545,7 @@ private:
                     if (x == 0.0) {
                         break;
                     }
-                    s = std::sqrt(p * p + q * q + r * r);
+                    double s = std::sqrt(p * p + q * q + r * r);
                     if (p < 0) {
                         s = -s;
                     }
@@ -617,6 +617,7 @@ private:
             if (q == 0) {
                 // Real vector
                 double z = std::numeric_limits<double>::quiet_NaN();
+                double s = std::numeric_limits<double>::quiet_NaN();
 
                 int l = n1;
                 H[n1][n1] = 1.0;
@@ -667,6 +668,7 @@ private:
             } else if (q < 0) {
                 double z = std::numeric_limits<double>::quiet_NaN();
                 double r = std::numeric_limits<double>::quiet_NaN();
+                double s = std::numeric_limits<double>::quiet_NaN();
 
                 int l = n1 - 1;
 
