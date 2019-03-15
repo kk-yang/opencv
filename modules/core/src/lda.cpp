@@ -330,7 +330,7 @@ private:
         int high = nn - 1;
         double eps = std::pow(2.0, -52.0);
         double exshift = 0.0;
-        double p = 0, q = 0, t, w;
+        double p = 0, q = 0, t;
 
         // Store roots isolated by balanc and compute matrix norm
 
@@ -378,7 +378,7 @@ private:
                 // Two roots found
 
             } else if (l == n1 - 1) {
-                w = H[n1][n1 - 1] * H[n1 - 1][n1];
+                double w = H[n1][n1 - 1] * H[n1 - 1][n1];
                 p = (H[n1 - 1][n1 - 1] - H[n1][n1]) / 2.0;
                 q = p * p + w;
                 double z = std::sqrt(std::abs(q));
@@ -452,7 +452,7 @@ private:
 
                 double x = H[n1][n1];
                 double y = 0.0;
-                w = 0.0;
+                double w = 0.0;
                 if (l < n1) {
                     y = H[n1 - 1][n1 - 1];
                     w = H[n1][n1 - 1] * H[n1 - 1][n1];
@@ -622,7 +622,7 @@ private:
                 int l = n1;
                 H[n1][n1] = 1.0;
                 for (int i = n1 - 1; i >= 0; i--) {
-                    w = H[i][i] - p;
+                    double w = H[i][i] - p;
                     double r = 0.0;
                     for (int j = l; j <= n1; j++) {
                         r = r + H[i][j] * H[j][n1];
@@ -692,7 +692,7 @@ private:
                         ra = ra + H[i][j] * H[j][n1 - 1];
                         sa = sa + H[i][j] * H[j][n1];
                     }
-                    w = H[i][i] - p;
+                    double w = H[i][i] - p;
 
                     if (e[i] < 0.0) {
                         z = w;
