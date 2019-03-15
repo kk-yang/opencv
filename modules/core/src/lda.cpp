@@ -330,7 +330,7 @@ private:
         int high = nn - 1;
         double eps = std::pow(2.0, -52.0);
         double exshift = 0.0;
-        double p = 0, q = 0, r = 0, s = 0, z = 0, t, w, x, y;
+        double p = 0, q = 0, r = 0, s = 0, z = 0, t, w;
 
         // Store roots isolated by balanc and compute matrix norm
 
@@ -384,7 +384,7 @@ private:
                 z = std::sqrt(std::abs(q));
                 H[n1][n1] = H[n1][n1] + exshift;
                 H[n1 - 1][n1 - 1] = H[n1 - 1][n1 - 1] + exshift;
-                x = H[n1][n1];
+                double x = H[n1][n1];
 
                 // Real pair
 
@@ -450,8 +450,8 @@ private:
 
                 // Form shift
 
-                x = H[n1][n1];
-                y = 0.0;
+                double x = H[n1][n1];
+                double y = 0.0;
                 w = 0.0;
                 if (l < n1) {
                     y = H[n1 - 1][n1 - 1];
@@ -635,8 +635,8 @@ private:
                             // Solve real equations
 
                         } else {
-                            x = H[i][i + 1];
-                            y = H[i + 1][i];
+                            double x = H[i][i + 1];
+                            double y = H[i + 1][i];
                             q = (d[i] - p) * (d[i] - p) + e[i] * e[i];
                             t = (x * s - z * r) / q;
                             H[i][n1] = t;
@@ -697,8 +697,8 @@ private:
 
                             // Solve complex equations
 
-                            x = H[i][i + 1];
-                            y = H[i + 1][i];
+                            double x = H[i][i + 1];
+                            double y = H[i + 1][i];
                             vr = (d[i] - p) * (d[i] - p) + e[i] * e[i] - q * q;
                             vi = (d[i] - p) * 2.0 * q;
                             if (vr == 0.0 && vi == 0.0) {
