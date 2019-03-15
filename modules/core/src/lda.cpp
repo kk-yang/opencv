@@ -248,9 +248,6 @@ private:
     // Holds the data dimension.
     int n;
 
-    // Stores real/imag part of a complex division.
-    double cdivr, cdivi;
-
     // Pointer to internal memory.
     double *d, *e, *ort;
     double **V, **H;
@@ -297,8 +294,9 @@ private:
         return arr;
     }
 
-    void cdiv(double xr, double xi, double yr, double yi) {
+    static void complex_div(double xr, double xi, double yr, double yi, double& cdivr, double& cdivi) {
         double r, dv;
+        CV_DbgAssert(std::abs(yr) + std::abs(yi) > 0.0);
         if (std::abs(yr) > std::abs(yi)) {
             r = yi / yr;
             dv = yr + r * yi;
@@ -679,9 +677,11 @@ private:
                     H[n1 - 1][n1 - 1] = q / H[n1][n1 - 1];
                     H[n1 - 1][n1] = -(H[n1][n1] - p) / H[n1][n1 - 1];
                 } else {
-                    cdiv(0.0, -H[n1 - 1][n1], H[n1 - 1][n1 - 1] - p, q);
-                    H[n1 - 1][n1 - 1] = cdivr;
-                    H[n1 - 1][n1] = cdivi;
+                    complex_div(
+                            0.0, -H[n1 - 1][n1],
+                            H[n1 - 1][n1 - 1] - p, q,
+                            H[n1 - 1][n1 - 1], H[n1 - 1][n1]
+                    );
                 }
                 H[n1][n1 - 1] = 0.0;
                 H[n1][n1] = 1.0;
@@ -702,9 +702,11 @@ private:
                     } else {
                         l = i;
                         if (e[i] == 0) {
-                            cdiv(-ra, -sa, w, q);
-                            H[i][n1 - 1] = cdivr;
-                            H[i][n1] = cdivi;
+                            complex_div(
+                                    -ra, -sa,
+                                    w, q,
+                                    H[i][n1 - 1], H[i][n1]
+                            );
                         } else {
                             // Solve complex equations
 
@@ -716,20 +718,20 @@ private:
                                 vr = eps * norm * (std::abs(w) + std::abs(q) + std::abs(x)
                                                    + std::abs(y) + std::abs(z));
                             }
-                            cdiv(x * r - z * ra + q * sa,
-                                 x * s - z * sa - q * ra, vr, vi);
-                            H[i][n1 - 1] = cdivr;
-                            H[i][n1] = cdivi;
+                            complex_div(
+                                    x * r - z * ra + q * sa, x * s - z * sa - q * ra,
+                                    vr, vi,
+                                    H[i][n1 - 1], H[i][n1]);
                             if (std::abs(x) > (std::abs(z) + std::abs(q))) {
                                 H[i + 1][n1 - 1] = (-ra - w * H[i][n1 - 1] + q
                                                    * H[i][n1]) / x;
                                 H[i + 1][n1] = (-sa - w * H[i][n1] - q * H[i][n1
                                                                             - 1]) / x;
                             } else {
-                                cdiv(-r - y * H[i][n1 - 1], -s - y * H[i][n1], z,
-                                     q);
-                                H[i + 1][n1 - 1] = cdivr;
-                                H[i + 1][n1] = cdivi;
+                                complex_div(
+                                        -r - y * H[i][n1 - 1], -s - y * H[i][n1],
+                                        z, q,
+                                        H[i + 1][n1 - 1], H[i + 1][n1]);
                             }
                         }
 
