@@ -330,7 +330,7 @@ private:
         int high = nn - 1;
         double eps = std::pow(2.0, -52.0);
         double exshift = 0.0;
-        double p = 0, q = 0, t;
+        double p = 0, q = 0;
 
         // Store roots isolated by balanc and compute matrix norm
 
@@ -645,7 +645,7 @@ private:
                             double x = H[i][i + 1];
                             double y = H[i + 1][i];
                             q = (d[i] - p) * (d[i] - p) + e[i] * e[i];
-                            t = (x * s - z * r) / q;
+                            double t = (x * s - z * r) / q;
                             H[i][n1] = t;
                             if (std::abs(x) > std::abs(z)) {
                                 H[i + 1][n1] = (-r - w * t) / x;
@@ -656,7 +656,7 @@ private:
 
                         // Overflow control
 
-                        t = std::abs(H[i][n1]);
+                        double t = std::abs(H[i][n1]);
                         if ((eps * t) * t > 1) {
                             for (int j = i; j <= n1; j++) {
                                 H[j][n1] = H[j][n1] / t;
@@ -734,7 +734,7 @@ private:
 
                         // Overflow control
 
-                        t = std::max(std::abs(H[i][n1 - 1]), std::abs(H[i][n1]));
+                        double t = std::max(std::abs(H[i][n1 - 1]), std::abs(H[i][n1]));
                         if ((eps * t) * t > 1) {
                             for (int j = i; j <= n1; j++) {
                                 H[j][n1 - 1] = H[j][n1 - 1] / t;
