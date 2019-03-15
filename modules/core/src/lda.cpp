@@ -330,7 +330,6 @@ private:
         int high = nn - 1;
         double eps = std::pow(2.0, -52.0);
         double exshift = 0.0;
-        double p = 0, q = 0;
 
         // Store roots isolated by balanc and compute matrix norm
 
@@ -379,8 +378,8 @@ private:
 
             } else if (l == n1 - 1) {
                 double w = H[n1][n1 - 1] * H[n1 - 1][n1];
-                p = (H[n1 - 1][n1 - 1] - H[n1][n1]) / 2.0;
-                q = p * p + w;
+                double p = (H[n1 - 1][n1 - 1] - H[n1][n1]) / 2.0;
+                double q = p * p + w;
                 double z = std::sqrt(std::abs(q));
                 H[n1][n1] = H[n1][n1] + exshift;
                 H[n1 - 1][n1 - 1] = H[n1 - 1][n1 - 1] + exshift;
@@ -493,6 +492,8 @@ private:
                 if (iter > max_iters_count)
                     CV_Error(Error::StsNoConv, "Algorithm doesn't converge (complex eigen values?)");
 
+                double p = std::numeric_limits<double>::quiet_NaN();
+                double q = std::numeric_limits<double>::quiet_NaN();
                 double r = std::numeric_limits<double>::quiet_NaN();
 
                 // Look for two consecutive small sub-diagonal elements
@@ -609,8 +610,8 @@ private:
         }
 
         for (n1 = nn - 1; n1 >= 0; n1--) {
-            p = d[n1];
-            q = e[n1];
+            double p = d[n1];
+            double q = e[n1];
 
             // Real vector
 
