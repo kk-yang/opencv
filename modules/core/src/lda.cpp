@@ -330,7 +330,7 @@ private:
         int high = nn - 1;
         double eps = std::pow(2.0, -52.0);
         double exshift = 0.0;
-        double p = 0, q = 0, r = 0, s = 0, t, w;
+        double p = 0, q = 0, s = 0, t, w;
 
         // Store roots isolated by balanc and compute matrix norm
 
@@ -405,7 +405,7 @@ private:
                     s = std::abs(x) + std::abs(z);
                     p = x / s;
                     q = z / s;
-                    r = std::sqrt(p * p + q * q);
+                    double r = std::sqrt(p * p + q * q);
                     p = p / r;
                     q = q / r;
 
@@ -493,6 +493,8 @@ private:
                 if (iter > max_iters_count)
                     CV_Error(Error::StsNoConv, "Algorithm doesn't converge (complex eigen values?)");
 
+                double r = std::numeric_limits<double>::quiet_NaN();
+
                 // Look for two consecutive small sub-diagonal elements
                 int m = n1 - 2;
                 while (m >= l) {
@@ -527,6 +529,7 @@ private:
                 // Double QR step involving rows l:n and columns m:n
 
                 for (int k = m; k < n1; k++) {
+
                     bool notlast = (k != n1 - 1);
                     if (k != m) {
                         p = H[k][k - 1];
@@ -619,7 +622,7 @@ private:
                 H[n1][n1] = 1.0;
                 for (int i = n1 - 1; i >= 0; i--) {
                     w = H[i][i] - p;
-                    r = 0.0;
+                    double r = 0.0;
                     for (int j = l; j <= n1; j++) {
                         r = r + H[i][j] * H[j][n1];
                     }
@@ -663,6 +666,7 @@ private:
                 // Complex vector
             } else if (q < 0) {
                 double z = std::numeric_limits<double>::quiet_NaN();
+                double r = std::numeric_limits<double>::quiet_NaN();
 
                 int l = n1 - 1;
 
