@@ -789,14 +789,17 @@ include(cmake/OpenCVFindProtobuf.cmake)
 #  Detect other 3rd-party libraries/tools
 # ----------------------------------------------------------------------------
 
+# --- Android Support ---
+if(ANDROID)
+  include(cmake/android/OpenCVDetectAndroidSDK.cmake)
+endif()
+
 # --- Java Support ---
-if(BUILD_JAVA)
-  if(ANDROID)
-    include(cmake/android/OpenCVDetectAndroidSDK.cmake)
-  else()
-    include(cmake/OpenCVDetectApacheAnt.cmake)
-    find_package(JNI)
-  endif()
+if(BUILD_JAVA
+    AND NOT ANDROID  # handled by Android scripts
+)
+  include(cmake/OpenCVDetectApacheAnt.cmake)
+  find_package(JNI)
 endif()
 
 if(ENABLE_PYLINT AND PYTHON_DEFAULT_AVAILABLE)
