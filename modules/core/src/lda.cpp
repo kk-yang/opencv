@@ -865,15 +865,15 @@ private:
     // Releases all internal working memory.
     void release() {
         // releases the working data
-        delete[] d;
-        delete[] e;
-        delete[] ort;
+        delete[] d; d = NULL;
+        delete[] e; e = NULL;
+        delete[] ort; ort = NULL;
         for (int i = 0; i < n; i++) {
-            delete[] H[i];
-            delete[] V[i];
+            if (H) delete[] H[i];
+            if (V) delete[] V[i];
         }
-        delete[] H;
-        delete[] V;
+        delete[] H; H = NULL;
+        delete[] V; V = NULL;
     }
 
     // Computes the Eigenvalue Decomposition for a matrix given in H.
@@ -883,7 +883,7 @@ private:
         d = alloc_1d<double> (n);
         e = alloc_1d<double> (n);
         ort = alloc_1d<double> (n);
-        try {
+        {
             // Reduce to Hessenberg form.
             orthes();
             // Reduce Hessenberg to real Schur form.
@@ -901,11 +901,6 @@ private:
             // Deallocate the memory by releasing all internal working data.
             release();
         }
-        catch (...)
-        {
-            release();
-            throw;
-        }
     }
 
 public:
@@ -913,7 +908,11 @@ public:
     // given in src. This function is a port of the EigenvalueSolver in JAMA,
     // which has been released to public domain by The MathWorks and the
     // National Institute of Standards and Technology (NIST).
-    EigenvalueDecomposition(InputArray src, bool fallbackSymmetric = true) {
+    EigenvalueDecomposition(InputArray src, bool fallbackSymmetric = true) :
+        n(0),
+        d(NULL), e(NULL), ort(NULL),
+        V(NULL), H(NULL)
+    {
         compute(src, fallbackSymmetric);
     }
 
@@ -951,7 +950,7 @@ public:
         }
     }
 
-    ~EigenvalueDecomposition() {}
+    ~EigenvalueDecomposition() { release(); }
 
     // Returns the eigenvalues of the Eigenvalue Decomposition.
     Mat eigenvalues() const { return _eigenvalues; }
