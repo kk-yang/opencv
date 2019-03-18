@@ -322,23 +322,25 @@ private:
         // Initialize
         const int max_iters_count = 1000 * this->n;
 
-        int nn = this->n;
+        const int nn = this->n; CV_Assert(nn > 0);
         int n1 = nn - 1;
-        int low = 0;
-        int high = nn - 1;
-        double eps = std::pow(2.0, -52.0);
+        const int low = 0;
+        const int high = nn - 1;
+        const double eps = std::numeric_limits<double>::epsilon();
         double exshift = 0.0;
 
         // Store roots isolated by balanc and compute matrix norm
 
         double norm = 0.0;
         for (int i = 0; i < nn; i++) {
+#if 0 // 'if' condition is always false
             if (i < low || i > high) {
                 d[i] = H[i][i];
                 e[i] = 0.0;
             }
+#endif
             for (int j = std::max(i - 1, 0); j < nn; j++) {
-                norm = norm + std::abs(H[i][j]);
+                norm += std::abs(H[i][j]);
             }
         }
 
@@ -363,29 +365,26 @@ private:
             }
 
             // Check for convergence
-            // One root found
-
             if (l == n1) {
+                // One root found
                 H[n1][n1] = H[n1][n1] + exshift;
                 d[n1] = H[n1][n1];
                 e[n1] = 0.0;
                 n1--;
                 iter = 0;
 
-                // Two roots found
-
             } else if (l == n1 - 1) {
+                // Two roots found
                 double w = H[n1][n1 - 1] * H[n1 - 1][n1];
-                double p = (H[n1 - 1][n1 - 1] - H[n1][n1]) / 2.0;
+                double p = (H[n1 - 1][n1 - 1] - H[n1][n1]) * 0.5;
                 double q = p * p + w;
                 double z = std::sqrt(std::abs(q));
                 H[n1][n1] = H[n1][n1] + exshift;
                 H[n1 - 1][n1 - 1] = H[n1 - 1][n1 - 1] + exshift;
                 double x = H[n1][n1];
 
-                // Real pair
-
                 if (q >= 0) {
+                    // Real pair
                     if (p >= 0) {
                         z = p + z;
                     } else {
@@ -430,9 +429,8 @@ private:
                         V[i][n1] = q * V[i][n1] - p * z;
                     }
 
-                    // Complex pair
-
                 } else {
+                    // Complex pair
                     d[n1 - 1] = x + p;
                     d[n1] = x + p;
                     e[n1 - 1] = z;
@@ -441,12 +439,10 @@ private:
                 n1 = n1 - 2;
                 iter = 0;
 
+            } else {
                 // No convergence yet
 
-            } else {
-
                 // Form shift
-
                 double x = H[n1][n1];
                 double y = 0.0;
                 double w = 0.0;
@@ -456,7 +452,6 @@ private:
                 }
 
                 // Wilkinson's original ad hoc shift
-
                 if (iter == 10) {
                     exshift += x;
                     for (int i = low; i <= n1; i++) {
@@ -470,14 +465,14 @@ private:
                 // MATLAB's new ad hoc shift
 
                 if (iter == 30) {
-                    double s = (y - x) / 2.0;
+                    double s = (y - x) * 0.5;
                     s = s * s + w;
                     if (s > 0) {
                         s = std::sqrt(s);
                         if (y < x) {
                             s = -s;
                         }
-                        s = x - w / ((y - x) / 2.0 + s);
+                        s = x - w / ((y - x) * 0.5 + s);
                         for (int i = low; i <= n1; i++) {
                             H[i][i] -= s;
                         }
@@ -569,8 +564,8 @@ private:
                                 p = p + r * H[k + 2][j];
                                 H[k + 2][j] = H[k + 2][j] - p * z;
                             }
-                            H[k][j] = H[k][j] - p * x;
-                            H[k + 1][j] = H[k + 1][j] - p * y;
+                            H[k][j] -= p * x;
+                            H[k + 1][j] -= p * y;
                         }
 
                         // Column modification
@@ -581,8 +576,8 @@ private:
                                 p = p + z * H[i][k + 2];
                                 H[i][k + 2] = H[i][k + 2] - p * r;
                             }
-                            H[i][k] = H[i][k] - p;
-                            H[i][k + 1] = H[i][k + 1] - p * q;
+                            H[i][k] -= p;
+                            H[i][k + 1] -= p * q;
                         }
 
                         // Accumulate transformations
@@ -611,8 +606,6 @@ private:
             double p = d[n1];
             double q = e[n1];
 
-            // Real vector
-
             if (q == 0) {
                 // Real vector
                 double z = std::numeric_limits<double>::quiet_NaN();
@@ -637,10 +630,9 @@ private:
                             } else {
                                 H[i][n1] = -r / (eps * norm);
                             }
-
-                            // Solve real equations
-
                         } else {
+                            // Solve real equations
+                            CV_DbgAssert(!cvIsNaN(z));
                             double x = H[i][i + 1];
                             double y = H[i + 1][i];
                             q = (d[i] - p) * (d[i] - p) + e[i] * e[i];
@@ -649,22 +641,23 @@ private:
                             if (std::abs(x) > std::abs(z)) {
                                 H[i + 1][n1] = (-r - w * t) / x;
                             } else {
+                                CV_DbgAssert(z != 0.0);
                                 H[i + 1][n1] = (-s - y * t) / z;
                             }
                         }
 
                         // Overflow control
-
                         double t = std::abs(H[i][n1]);
                         if ((eps * t) * t > 1) {
+                            double inv_t = 1.0 / t;
                             for (int j = i; j <= n1; j++) {
-                                H[j][n1] = H[j][n1] / t;
+                                H[j][n1] *= inv_t;
                             }
                         }
                     }
                 }
-                // Complex vector
             } else if (q < 0) {
+                // Complex vector
                 double z = std::numeric_limits<double>::quiet_NaN();
                 double r = std::numeric_limits<double>::quiet_NaN();
                 double s = std::numeric_limits<double>::quiet_NaN();
@@ -751,6 +744,7 @@ private:
 
         // Vectors of isolated roots
 
+#if 0 // 'if' condition is always false
         for (int i = 0; i < nn; i++) {
             if (i < low || i > high) {
                 for (int j = i; j < nn; j++) {
@@ -758,6 +752,7 @@ private:
                 }
             }
         }
+#endif
 
         // Back transformation to get eigenvectors of original matrix
 
