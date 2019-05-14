@@ -1,3 +1,7 @@
+#include <iostream>
+
+#if defined(_MSC_VER) || defined(__APPLE__) || defined HAVE_THREADS
+
 #include <fstream>
 #include <sstream>
 #include <thread>
@@ -379,3 +383,11 @@ void callback(int pos, void*)
 {
     confThreshold = pos * 0.01f;
 }
+
+#else
+int main(int argc, char** argv)
+{
+    std::cerr << "ERROR: This sample has been compiled without threads support" << std::endl;
+    return 1;
+}
+#endif

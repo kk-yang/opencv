@@ -1,3 +1,7 @@
+if(POLICY CMP0003)
+  cmake_policy(SET CMP0003 NEW)
+endif()
+
 # Utility function: adds sample executable target with name "example_<group>_<file_name>"
 # Usage:
 #   ocv_define_sample(<output target> <relative filename> <group>)
@@ -5,6 +9,9 @@ function(ocv_define_sample out_target source sub)
   get_filename_component(name "${source}" NAME_WE)
   set(the_target "example_${sub}_${name}")
   add_executable(${the_target} "${source}")
+  if(TARGET Threads::Threads AND NOT OPENCV_EXAMPLES_DISABLE_THREADS)
+    target_link_libraries(${the_target} Threads::Threads)
+  endif()
   set_target_properties(${the_target} PROPERTIES PROJECT_LABEL "(sample) ${name}")
   if(ENABLE_SOLUTION_FOLDERS)
     set_target_properties(${the_target} PROPERTIES FOLDER "samples/${sub}")
@@ -42,6 +49,10 @@ function(ocv_install_example_src relpath)
             COMPONENT samples)
   endif()
 endfunction()
+
+if((TARGET Threads::Threads OR HAVE_PTHREAD OR MSVC OR APPLE) AND NOT OPENCV_EXAMPLES_DISABLE_THREADS)
+  add_definitions(-DHAVE_THREADS=1)
+endif()
 
 add_subdirectory(cpp)
 add_subdirectory(java/tutorial_code)
@@ -125,6 +136,17 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libcmt.lib")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmtd.lib")
   endif()
+endif()
+
+if(OPENCV_EXAMPLES_DISABLE_THREADS)
+  # nothing
+elseif(MSVC OR APPLE)
+  set(HAVE_THREADS 1)
+else()
+  find_package(Threads)
+endif()
+if((TARGET Threads::Threads OR HAVE_THREADS) AND NOT OPENCV_EXAMPLES_DISABLE_THREADS)
+  add_definitions(-DHAVE_THREADS=1)
 endif()
 
 add_definitions(-DDISABLE_OPENCV_24_COMPATIBILITY=1)  # Avoid C-like legacy API
