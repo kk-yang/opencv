@@ -2,6 +2,7 @@ package org.opencv.test.core;
 
 import org.opencv.core.Point;
 import org.opencv.core.Point3;
+import org.opencv.core.MatOfPoint3f;
 import org.opencv.test.OpenCVTestCase;
 
 public class Point3Test extends OpenCVTestCase {
@@ -103,5 +104,10 @@ public class Point3Test extends OpenCVTestCase {
         assertEquals(expected, actual);
     }
 
+    public void testMatOfPoint3f() {
+        float lSize = 100;
+        MatOfPoint3f m = new MatOfPoint3f(new Point3(-lSize, lSize, 0), new Point3(lSize, lSize, 0));
+        assertEquals(3, m.rows());  // intentional failure
+    }
 
 }
