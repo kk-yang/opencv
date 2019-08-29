@@ -87,6 +87,10 @@ ocv_target_link_libraries(${the_module} LINK_PRIVATE
     "${OPENCV_HAL_LINKER_LIBS}"
 )
 
+if(HAVE_CXX_ATOMICS_WITH_LIB)
+  ocv_target_link_libraries(${the_module} LINK_PUBLIC atomic)
+endif()
+
 ocv_add_accuracy_tests()
 ocv_add_perf_tests()
 
