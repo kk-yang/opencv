@@ -1199,7 +1199,7 @@ struct SymmColumnSmallVec_32s16s
                     i += v_int32::nlanes;
                 }
             }
-#if CV_NEON
+#if CV_NEON || CV_MSA
             else if( ky[0] == (float)((int)ky[0]) && ky[1] == (float)((int)ky[1]) )
             {
                 v_int32 k0 = vx_setall_s32((int)ky[0]), k1 = vx_setall_s32((int)ky[1]);
