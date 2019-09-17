@@ -523,7 +523,7 @@ DISOpticalFlowImpl::PatchInverseSearch_ParBody::PatchInverseSearch_ParBody(DISOp
     v_expand(I1_row_next_shifted_8, I1_row_next_shifted_4_left, I1_row_next_shifted_4_right);                          \
                                                                                                                        \
     /* Load current row of I0: */                                                                                      \
-    I0_row_16 = v_load(I0_ptr);                                                                                        \
+    I0_row_16 = v_load_low(I0_ptr);                                                                                    \
     v_expand(I0_row_16, I0_row_8, tmp);                                                                                \
     v_expand(I0_row_8, I0_row_4_left, I0_row_4_right);                                                                 \
                                                                                                                        \
