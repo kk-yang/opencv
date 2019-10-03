@@ -48,17 +48,9 @@
 #pragma warning(disable: 4996)  // was declared deprecated
 #endif
 
-#if defined(__GNUC__)
-#pragma GCC visibility push(default)
-#endif
-
 #include <inference_engine.hpp>
 
 #include <ie_builders.hpp>
-
-#if defined(__GNUC__)
-#pragma GCC visibility pop
-#endif
 
 #if defined(__GNUC__) && __GNUC__ >= 5
 //#pragma GCC diagnostic pop
