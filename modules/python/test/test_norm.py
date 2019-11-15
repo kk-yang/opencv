@@ -88,7 +88,7 @@ def get_element_types(norm_type):
 
 def generate_vector(size, dtype):
     if np.issubdtype(dtype, np.integer):
-        return np.random.randint(0, 100, size, dtype=dtype)
+        return np.random.randint(0, 100, size).astype(dtype)
     else:
         return 10. + 12.5 * np.random.randn(size).astype(dtype)
 
