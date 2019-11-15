@@ -174,10 +174,6 @@ gen_template_rw_prop_init = Template("""
 
 simple_argtype_mapping = {
     "bool": ("bool", "b", "0"),
-    "size_t": ("size_t", "I", "0"),
-    "int": ("int", "i", "0"),
-    "float": ("float", "f", "0.f"),
-    "double": ("double", "d", "0"),
     "c_string": ("char*", "s", '(char*)""')
 }
 
