@@ -3,43 +3,47 @@
 from itertools import product
 from functools import reduce
 
-import cv2 as cv
 import numpy as np
+import cv2 as cv
 
 from tests_common import NewOpenCVTests
 
 
 def norm_inf(x, y=None):
     def norm(vec):
-        return np.linalg.norm(vec, np.inf)
+        return np.linalg.norm(vec.flatten(), np.inf)
 
-    return norm(x) if y is None else norm(x-y)
+    x = x.astype(np.float64)
+    return norm(x) if y is None else norm(x - y.astype(np.float64))
 
 
 def norm_l1(x, y=None):
     def norm(vec):
-        return np.linalg.norm(vec, 1)
+        return np.linalg.norm(vec.flatten(), 1)
 
-    return norm(x) if y is None else norm(x-y)
+    x = x.astype(np.float64)
+    return norm(x) if y is None else norm(x - y.astype(np.float64))
 
 
 def norm_l2(x, y=None):
     def norm(vec):
-        return np.linalg.norm(vec)
+        return np.linalg.norm(vec.flatten())
 
-    return norm(x) if y is None else norm(x-y)
+    x = x.astype(np.float64)
+    return norm(x) if y is None else norm(x - y.astype(np.float64))
 
 
 def norm_l2sqr(x, y=None):
     def norm(vec):
         return np.square(vec).sum()
 
-    return norm(x) if y is None else norm(x-y)
+    x = x.astype(np.float64)
+    return norm(x) if y is None else norm(x - y.astype(np.float64))
 
 
 def norm_hamming(x, y=None):
     def norm(vec):
-        return sum(bin(i).count('1') for i in vec)
+        return sum(bin(i).count('1') for i in vec.flatten())
 
     return norm(x) if y is None else norm(np.bitwise_xor(x, y))
 
@@ -55,7 +59,7 @@ def norm_hamming2(x, y=None):
                           for i in range(0, len(binary_str), 2)))
             return sum(1 for _ in gen)
 
-        return sum(element_norm(element) for element in vec)
+        return sum(element_norm(element) for element in vec.flatten())
 
     return norm(x) if y is None else norm(np.bitwise_xor(x, y))
 
@@ -83,46 +87,53 @@ def get_element_types(norm_type):
     if norm_type in (cv.NORM_HAMMING, cv.NORM_HAMMING2):
         return (np.uint8,)
     else:
-        return (np.int16, np.int32, np.float32, np.float64)
+        return (np.uint8, np.int8, np.uint16, np.int16, np.int32, np.float32,
+                np.float64)
 
 
-def generate_vector(size, dtype):
+def generate_vector(shape, dtype):
     if np.issubdtype(dtype, np.integer):
-        return np.random.randint(0, 100, size).astype(dtype)
+        return np.random.randint(0, 100, shape).astype(dtype)
     else:
-        return 10. + 12.5 * np.random.randn(size).astype(dtype)
+        return np.random.normal(10., 12.5, shape).astype(dtype)
 
 
-sizes = (1, 2, 3, 5, 7, 19, 21, 32)
+shapes = (1, 2, 3, 5, 7, 16, (1, 1), (2, 2), (3, 5), (1, 7))
 
 
-class CVNormTests(NewOpenCVTests):
+class norm_test(NewOpenCVTests):
 
     def test_norm_for_one_array(self):
+        np.random.seed(123)
         for norm_type, norm in norm_type_under_test.items():
             element_types = get_element_types(norm_type)
-            for size, element_type in product(sizes, element_types):
-                array = generate_vector(size, element_type)
+            for shape, element_type in product(shapes, element_types):
+                array = generate_vector(shape, element_type)
                 expected = norm(array)
                 actual = cv.norm(array, norm_type)
                 self.assertAlmostEqual(
                     expected, actual, places=2,
-                    msg='Array {0} and norm {1}'.format(array,
-                                                        norm_name[norm_type])
+                    msg='Array {0} of {1} and norm {2}'.format(
+                        array, element_type.__name__, norm_name[norm_type]
+                    )
                 )
 
     def test_norm_for_two_arrays(self):
+        np.random.seed(456)
         for norm_type, norm in norm_type_under_test.items():
             element_types = get_element_types(norm_type)
-            for size, element_type in product(sizes, element_types):
-                first = generate_vector(size, element_type)
-                second = generate_vector(size, element_type)
+            for shape, element_type in product(shapes, element_types):
+                first = generate_vector(shape, element_type)
+                second = generate_vector(shape, element_type)
                 expected = norm(first, second)
                 actual = cv.norm(first, second, norm_type)
-                self.assertAlmostEqual(expected, actual, places=2,
-                                       msg='Arrays {0} {1} and norm {2}'.format(
-                                           first, second, norm_name[norm_type]
-                                       ))
+                self.assertAlmostEqual(
+                    expected, actual, places=2,
+                    msg='Arrays {0} {1} of type {2} and norm {3}'.format(
+                        first, second, element_type.__name__,
+                        norm_name[norm_type]
+                    )
+                )
 
     def test_norm_fails_for_wrong_type(self):
         for norm_type in (cv.NORM_HAMMING, cv.NORM_HAMMING2):
