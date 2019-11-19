@@ -84,6 +84,32 @@ class Arguments(NewOpenCVTests):
         self.assertEqual(res4, "InputArrayOfArrays: empty()=false kind=0x00050000 flags=0x01050000 total(-1)=3 dims(-1)=1 size(-1)=3x1 type(0)=CV_32FC2 dims(0)=2 size(0)=3x1 type(0)=CV_32FC2")
 
 
+    def test_conversion_int(self):
+        self.assertEqual(cv.utils.dumpInt(42), "Int: 42")
+        self.assertEqual(cv.utils.dumpInt(-1), "Int: -1")
+        self.assertEqual(cv.utils.dumpInt(0), "Int: 0")
+        with self.assertRaises(TypeError, msg="Should not convert floating point values into 'int' type"):
+            print(cv.utils.dumpInt(5.5))
+        self.assertEqual(cv.utils.dumpInt(int(5.1)), "Int: 5")
+        self.assertEqual(cv.utils.dumpInt((42)), "Int: 42")  # single element tuple is not a tuple
+        with self.assertRaises(TypeError, msg="Should not convert tuple values into 'int' type"):
+            print(cv.utils.dumpInt((42,)), "Int: 42")
+        with self.assertRaises(TypeError, msg="Should not convert list values into 'int' type"):
+            print(cv.utils.dumpInt([5]))
+        with self.assertRaises(TypeError, msg="Should not convert symbol values into 'int' type"):
+            print(cv.utils.dumpInt('a'))
+        with self.assertRaises(TypeError, msg="Should not convert string values into 'int' type"):
+            print(cv.utils.dumpInt('abc'))
+        # numpy
+        b = np.array([17], dtype=np.int32)
+        self.assertEqual(cv.utils.dumpInt(int(b[0])), "Int: 17")
+        self.assertEqual(cv.utils.dumpInt(b[0]), "Int: 17")  # regression from new patch
+        #if 1:  # buggy implicit conversion in OpenCV 3.4.8
+        with self.assertRaises(TypeError, msg="Should not convert numpy array into 'int' type"):
+            print(cv.utils.dumpInt(b))
+
+
+
 class SamplesFindFile(NewOpenCVTests):
 
     def test_ExistedFile(self):

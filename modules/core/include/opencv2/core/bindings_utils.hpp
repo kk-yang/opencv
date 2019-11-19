@@ -43,6 +43,9 @@ AsyncArray testAsyncException()
     return p.getArrayResult();
 }
 
+CV_WRAP static inline
+String dumpInt(int argument) { return cv::format("Int: %d", argument); }
+
 //! @}
 }} // namespace
 
