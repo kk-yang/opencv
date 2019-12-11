@@ -1909,5 +1909,12 @@ TEST(Imgproc_warpPolar, identity)
 #endif
 }
 
+TEST(Imgproc_resize, regression_16137)
+{
+    Mat src(Size(640, 480), CV_8UC3, Scalar::all(0));
+    Mat dst;
+    resize(src, dst, Size(1280, 720), 0, 0, INTER_LINEAR);
+}
+
 }} // namespace
 /* End of file. */
