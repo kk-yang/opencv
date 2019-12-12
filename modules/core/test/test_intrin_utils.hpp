@@ -198,14 +198,18 @@ template <typename R> struct Data
                 return false;
         return true;
     }
-    LaneType d[R::nlanes];
+    typedef LaneType CV_DECL_ALIGNED(1) unaligned_LaneType;
+    unaligned_LaneType d[R::nlanes];
 };
 
 template<typename R> struct AlignedData
 {
+    AlignedData() { getUnaligned() = Data<R>(); }
+
     Data<R> CV_DECL_ALIGNED(CV_SIMD_WIDTH) a; // aligned
-    char dummy;
-    Data<R> u; // unaligned
+    char dummy[sizeof(Data<R>)+1];
+
+    Data<R>& getUnaligned() { return *(Data<R>*)&dummy[1]; } // CV_DECL_ALIGNED(1) u; // unaligned
 };
 
 template <typename R> std::ostream & operator<<(std::ostream & out, const Data<R> & d)
@@ -254,49 +258,50 @@ template<typename R> struct TheTest
     TheTest & test_loadstore()
     {
         AlignedData<R> data;
+        printf("data.getUnaligned().d=%p data.a.d=%p\n", (void*)data.getUnaligned().d, (void*)data.a.d);
         AlignedData<R> out;
 
         // check if addresses are aligned and unaligned respectively
         EXPECT_EQ((size_t)0, (size_t)&data.a.d % CV_SIMD_WIDTH);
-        EXPECT_NE((size_t)0, (size_t)&data.u.d % CV_SIMD_WIDTH);
+        EXPECT_NE((size_t)0, (size_t)&data.getUnaligned().d % CV_SIMD_WIDTH);
         EXPECT_EQ((size_t)0, (size_t)&out.a.d % CV_SIMD_WIDTH);
-        EXPECT_NE((size_t)0, (size_t)&out.u.d % CV_SIMD_WIDTH);
+        EXPECT_NE((size_t)0, (size_t)&out.getUnaligned().d % CV_SIMD_WIDTH);
 
         // check some initialization methods
         R r1 = data.a;
-        R r2 = vx_load(data.u.d);
+        R r2 = vx_load(data.getUnaligned().d);
         R r3 = vx_load_aligned(data.a.d);
         R r4(r2);
         EXPECT_EQ(data.a[0], r1.get0());
-        EXPECT_EQ(data.u[0], r2.get0());
+        EXPECT_EQ(data.getUnaligned()[0], r2.get0());
         EXPECT_EQ(data.a[0], r3.get0());
-        EXPECT_EQ(data.u[0], r4.get0());
+        EXPECT_EQ(data.getUnaligned()[0], r4.get0());
 
-        R r_low = vx_load_low((LaneType*)data.u.d);
-        EXPECT_EQ(data.u[0], r_low.get0());
-        v_store(out.u.d, r_low);
+        R r_low = vx_load_low((LaneType*)data.getUnaligned().d);
+        EXPECT_EQ(data.getUnaligned()[0], r_low.get0());
+        v_store(out.getUnaligned().d, r_low);
         for (int i = 0; i < R::nlanes/2; ++i)
         {
             SCOPED_TRACE(cv::format("i=%d", i));
-            EXPECT_EQ((LaneType)data.u[i], (LaneType)out.u[i]);
+            EXPECT_EQ((LaneType)data.getUnaligned()[i], (LaneType)out.getUnaligned()[i]);
         }
 
-        R r_low_align8byte = vx_load_low((LaneType*)((char*)data.u.d + (CV_SIMD_WIDTH / 2)));
-        EXPECT_EQ(data.u[R::nlanes/2], r_low_align8byte.get0());
-        v_store(out.u.d, r_low_align8byte);
+        R r_low_align8byte = vx_load_low((LaneType*)((char*)data.getUnaligned().d + (CV_SIMD_WIDTH / 2)));
+        EXPECT_EQ(data.getUnaligned()[R::nlanes/2], r_low_align8byte.get0());
+        v_store(out.getUnaligned().d, r_low_align8byte);
         for (int i = 0; i < R::nlanes/2; ++i)
         {
             SCOPED_TRACE(cv::format("i=%d", i));
-            EXPECT_EQ((LaneType)data.u[i + R::nlanes/2], (LaneType)out.u[i]);
+            EXPECT_EQ((LaneType)data.getUnaligned()[i + R::nlanes/2], (LaneType)out.getUnaligned()[i]);
         }
 
         // check some store methods
-        out.u.clear();
+        out.getUnaligned().clear();
         out.a.clear();
-        v_store(out.u.d, r1);
+        v_store(out.getUnaligned().d, r1);
         v_store_aligned(out.a.d, r2);
         EXPECT_EQ(data.a, out.a);
-        EXPECT_EQ(data.u, out.u);
+        EXPECT_EQ(data.getUnaligned(), out.getUnaligned());
 
         // check more store methods
         Data<R> d, res(0);
@@ -1480,15 +1485,15 @@ template<typename R> struct TheTest
 
         // check if addresses are aligned and unaligned respectively
         EXPECT_EQ((size_t)0, (size_t)&data.a.d % CV_SIMD_WIDTH);
-        EXPECT_NE((size_t)0, (size_t)&data.u.d % CV_SIMD_WIDTH);
+        EXPECT_NE((size_t)0, (size_t)&data.getUnaligned().d % CV_SIMD_WIDTH);
         EXPECT_EQ((size_t)0, (size_t)&out.a.d % CV_SIMD_WIDTH);
-        EXPECT_NE((size_t)0, (size_t)&out.u.d % CV_SIMD_WIDTH);
+        EXPECT_NE((size_t)0, (size_t)&out.getUnaligned().d % CV_SIMD_WIDTH);
 
         // check some initialization methods
-        R r1 = data.u;
+        R r1 = data.getUnaligned();
         R r2 = vx_load_expand((const float16_t*)data.a.d);
         R r3(r2);
-        EXPECT_EQ(data.u[0], r1.get0());
+        EXPECT_EQ(data.getUnaligned()[0], r1.get0());
         EXPECT_EQ(data.a[0], r2.get0());
         EXPECT_EQ(data.a[0], r3.get0());
 
