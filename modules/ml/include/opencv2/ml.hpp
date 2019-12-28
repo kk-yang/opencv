@@ -1276,6 +1276,9 @@ public:
     /** @copybrief getTermCriteria @see getTermCriteria */
     CV_WRAP virtual void setTermCriteria(const TermCriteria &val) = 0;
 
+    /** Set initial random number generator state for training the forest. */
+    virtual void setForestTrainRNG(const RNG& rng) = 0;
+
     /** Returns the variable importance array.
     The method returns the variable importance vector, computed at the training stage when
     CalculateVarImportance is set to true. If this flag was set to false, the empty matrix is

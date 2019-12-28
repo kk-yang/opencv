@@ -90,7 +90,7 @@ public:
         CV_TRACE_FUNCTION();
         DTreesImpl::clear();
         oobError = 0.;
-        rng = RNG((uint64)-1);
+        rng = initRng;
     }
 
     const vector<int>& getActiveVars() CV_OVERRIDE
@@ -425,6 +425,7 @@ public:
     vector<float> varImportance;
     vector<int> allVars, activeVars;
     RNG rng;
+    RNG initRng = RNG((uint64) - 1);
 };
 
 
@@ -437,6 +438,7 @@ public:
     inline void setActiveVarCount(int val) CV_OVERRIDE { impl.rparams.nactiveVars = val; }
     inline TermCriteria getTermCriteria() const CV_OVERRIDE { return impl.rparams.termCrit; }
     inline void setTermCriteria(const TermCriteria& val) CV_OVERRIDE { impl.rparams.termCrit = val; }
+    inline void setForestTrainRNG(const RNG& rng) CV_OVERRIDE { impl.initRng = rng; }
 
     inline int getMaxCategories() const CV_OVERRIDE { return impl.params.getMaxCategories(); }
     inline void setMaxCategories(int val) CV_OVERRIDE { impl.params.setMaxCategories(val); }
