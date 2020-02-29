@@ -3420,20 +3420,26 @@ MatCommaInitializer_<_Tp> operator << (const Mat_<_Tp>& m, T2 val)
 inline
 Mat& Mat::operator = (const MatExpr& e)
 {
+    Size esz = e.size();
     e.op->assign(e, *this);
+    CV_CheckEQ(esz, this->size(), "");
     return *this;
 }
 
 template<typename _Tp> inline
 Mat_<_Tp>::Mat_(const MatExpr& e)
 {
+    Size esz = e.size();
     e.op->assign(e, *this, traits::Type<_Tp>::value);
+    CV_CheckEQ(esz, this->size(), "");
 }
 
 template<typename _Tp> inline
 Mat_<_Tp>& Mat_<_Tp>::operator = (const MatExpr& e)
 {
+    Size esz = e.size();
     e.op->assign(e, *this, traits::Type<_Tp>::value);
+    CV_CheckEQ(esz, this->size(), "");
     return *this;
 }
 
@@ -3487,16 +3493,20 @@ MatExpr::MatExpr(const MatOp* _op, int _flags, const Mat& _a, const Mat& _b,
 inline
 MatExpr::operator Mat() const
 {
+    Size esz = this->size();
     Mat m;
     op->assign(*this, m);
+    CV_CheckEQ(esz, m.size(), "");
     return m;
 }
 
 template<typename _Tp> inline
 MatExpr::operator Mat_<_Tp>() const
 {
+    Size esz = this->size();
     Mat_<_Tp> m;
     op->assign(*this, m, traits::Type<_Tp>::value);
+    CV_CheckEQ(esz, m.size(), "");
     return m;
 }
 
