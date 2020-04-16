@@ -238,15 +238,13 @@ OCL_PERF_TEST_P(ScharrFixture, Scharr,
 
 ///////////// GaussianBlur ////////////////////////
 
-typedef FilterFixture GaussianBlurFixture;
+typedef FilterFixture OCL_GaussianBlurFixture;
 
-OCL_PERF_TEST_P(GaussianBlurFixture, GaussianBlur,
-            ::testing::Combine(OCL_TEST_SIZES, OCL_TEST_TYPES, OCL_PERF_ENUM(3, 5, 7)))
+PERF_TEST_P_(OCL_GaussianBlurFixture, GaussianBlur)
 {
-    const FilterParams params = GetParam();
+    const FilterParams& params = GetParam();
     const Size srcSize = get<0>(params);
     const int type = get<1>(params), ksize = get<2>(params);
-    const double eps = CV_MAT_DEPTH(type) <= CV_32S ? 2 + DBL_EPSILON : 3e-4;
 
     checkDeviceMaxMemoryAllocSize(srcSize, type);
 
@@ -255,8 +253,25 @@ OCL_PERF_TEST_P(GaussianBlurFixture, GaussianBlur,
 
     OCL_TEST_CYCLE() cv::GaussianBlur(src, dst, Size(ksize, ksize), 1, 1, cv::BORDER_CONSTANT);
 
-    SANITY_CHECK(dst, eps);
+    SANITY_CHECK_NOTHING();
 }
+
+INSTANTIATE_TEST_CASE_P(/*nothing*/, OCL_GaussianBlurFixture,
+    ::testing::Combine(
+        OCL_TEST_SIZES,
+        OCL_TEST_TYPES,
+        OCL_PERF_ENUM(3, 5, 7)
+    )
+);
+
+INSTANTIATE_TEST_CASE_P(SIFT, OCL_GaussianBlurFixture,
+    ::testing::Combine(
+        ::testing::Values(sz1080p),
+        ::testing::Values(CV_32FC1),
+        OCL_PERF_ENUM(11, 13, 17, 21, 27)
+    )
+);
+
 
 ///////////// Filter2D ////////////////////////
 
